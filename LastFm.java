@@ -14,7 +14,7 @@ public class LastFm {
 		
 	
 	public static void main(String[] args){
-		HashMap<String, String> hmFriends;
+		HashMap<String, HashSet<String>> hmFriends;
 		HashMap<String, User> hmUser;
-	}
+	} 
 }
