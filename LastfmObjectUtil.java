@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -63,10 +66,43 @@ public class LastfmObjectUtil {
 		NodeList nl = ele.getElementsByTagName(tagName);
 		if(nl != null && nl.getLength() > 0) {
 			Element el = (Element)nl.item(0);
+			if(el == null) return null;
+			if(el.getFirstChild() == null )return null;
 			textVal = el.getFirstChild().getNodeValue();
 		}
 
 		return textVal;
 	}
+	
+	public static int getIntValue(Element ele, String tagName) {
+		String textVal = getTextValue(ele, tagName);
+		if(textVal == null) return 0;
+		return Integer.parseInt(textVal);
+	}
+	
+	public static Date getDateValue(Element ele, String tagName) {
+		String textVal = getTextValue(ele, tagName);
+		if(textVal == null) return null;
+		//2008-03-10 04:32
+		String dateFormat = "dd MMM yyyy, HH:mm";
+		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+		try {
+			return sdf.parse(textVal);
+		} catch (ParseException e) {
+			String dateFormat2 = "yyyy-mm-dd HH:mm";
+			SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);
+			try {
+				return sdf2.parse(textVal);
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
 
 }
