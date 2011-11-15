@@ -1,16 +1,11 @@
 package lastfm;
 
-
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-
 import javax.ws.rs.core.Response;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
