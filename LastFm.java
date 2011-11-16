@@ -19,7 +19,9 @@ public class LastFm {
 				if(at.getTimeofPlay() != null && bt.getTimeofPlay() != null ){
 					//System.out.println("at.getTimeofPlay() "+at.getTimeofPlay()+"bt.getTimeofPlay()"+ bt.getTimeofPlay()+ at.getTimeofPlay().before(bt.getTimeofPlay()));
 					if (at.getTimeofPlay().before(bt.getTimeofPlay())){
-						influence += Math.exp(-1 * (at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
+						influence += Math.exp(-1 * (int)(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
+						//System.out.println("exp "+ -1*(int)(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
+						//System.out.println("influence "+influence);
 					}
 				}
 			}
@@ -168,7 +170,7 @@ public class LastFm {
 		Random rndGenerator = new Random(19580427);
 
 		try{
-			fstream = new FileWriter(outpath+"train.dat");
+			fstream = new FileWriter(outpath);
 			out = new BufferedWriter(fstream);
 			int count = 0;
 
