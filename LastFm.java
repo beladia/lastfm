@@ -146,7 +146,7 @@ public class LastFm {
 		// Get List of all Users
 		List<String> users = new ArrayList<String>(LastfmMain.hmUser.keySet());
 		HashSet<String> edgeList = new HashSet<String>();
-		int u1, u2;
+		int u1, u2, conn0, conn1, conn0Cnt, conn1Cnt;
 		String edgePair = null;
 		String user1, user2, connected;
 
@@ -158,8 +158,12 @@ public class LastFm {
 			fstream = new FileWriter(outpath+"train.dat");
 			out = new BufferedWriter(fstream);
 			int count = 0;
-			while(count < trainSz){
-
+			
+			conn1 = 0;
+			conn0 = 0;
+			conn0Cnt = (int)trainSz/2;
+			conn1Cnt = (int)trainSz/2;
+			while(conn0 < conn0Cnt && conn1 < conn1Cnt){
 				while(true){
 					// Randomly pick 2 Users
 					u1 = rndGenerator.nextInt(users.size());
@@ -186,9 +190,17 @@ public class LastFm {
 				if (count == 1)
 					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t connected \n");
 
-				if (LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1))
+				if (LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)){
 					connected = "1";
-				else connected = "0";
+					conn1++;
+				}
+				else {
+					connected = "0";
+					conn0++;
+				}
+				
+				if (conn1 >= conn1Cnt || conn0 >= conn0Cnt)
+					continue;
 
 				out.write(user1 + "_" + user2 + " \t " +
 						calculateOverallInfluence(LastfmMain.hmUser.get(user1)) + " \t " +
