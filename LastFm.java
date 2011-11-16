@@ -194,7 +194,7 @@ public class LastFm {
 					if (!(LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && (conn0 >= conn0Cnt))
 						continue;
 
-					if (u1 != u2 && !edgeList.contains(edgePair))
+					if ((u1 != u2) && !edgeList.contains(edgePair))
 						break;
 				}
 
