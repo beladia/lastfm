@@ -3,23 +3,23 @@ package lastfm;
 import java.util.*;
 
 public class LastFm {
-	HashMap<String, HashSet<String>> hmFriends;
-	HashMap<String, User> hmUser;	
+	//HashMap<String, HashSet<String>> hmFriends;
+	//HashMap<String, User> hmUser;	
 	
 	// Calculate influence score of User A on User B
 	public double calculateInfluence(User A, User B){
 		double influence = 0.0;
 		
 		// Get Common Tracks played by User A and User B
-		for (Track at : A.getTracks()){
-			for (Track bt : B.getTracks()){
+		for (Track at : A.getHsTracks()){
+			for (Track bt : B.getHsTracks()){
 				if (at.getTimeofPlay().before(bt.getTimeofPlay())){
 					influence += Math.exp(-1 * (at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
 				}
 			}
 		}
 		
-		influence = influence / B.getTracks().size();		
+		influence = influence / B.getHsTracks().size();		
 		return influence;		
 	}
 	
@@ -31,13 +31,13 @@ public class LastFm {
 		User B;
 		
 		// Get User A's friends
-		HashSet<String> friends = hmFriends.get(A.getID());
+		HashSet<String> friends = LastfmMain.hmFriends.get(A.getUserID());
 		
 		// For each of User A's friend B, calculate influence(A, B)
 		for (String friend : friends){
-			B = hmUser.get(friend);
-			influence += (B.getTracks().size() * calculateInfluence(A, B));
-			weightSum += B.getTracks().size();
+			B = LastfmMain.hmUser.get(friend);
+			influence += (B.getHsTracks().size() * calculateInfluence(A, B));
+			weightSum += B.getHsTracks().size();
 		}
 		
 		influence = influence / weightSum;
@@ -51,11 +51,11 @@ public class LastFm {
 		double influence = 0.0;
 		
 		HashSet<String> common = new HashSet<String>();
-		common.addAll(hmFriends.get(A.getID()));
-		common.retainAll(hmFriends.get(B.getID()));
+		common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
+		common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
 		
 		for (String c : common){
-			influence += calculateOverallInfluence(hmUser.get(c));
+			influence += calculateOverallInfluence(LastfmMain.hmUser.get(c));
 		}
 		
 		influence = influence / common.size();
@@ -69,15 +69,15 @@ public class LastFm {
 		double totalInfluence = 0.0;
 		
 		HashSet<String> common = new HashSet<String>();
-		common.addAll(hmFriends.get(A.getID()));
-		common.retainAll(hmFriends.get(B.getID()));
+		common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
+		common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
 		
 		for (String c : common){
-			influence += calculateInfluence(A, hmUser.get(c));
+			influence += calculateInfluence(A, LastfmMain.hmUser.get(c));
 		}
 		
-		for (String nbhA : hmFriends.get(A.getID())){
-			totalInfluence += calculateInfluence(A, hmUser.get(nbhA));
+		for (String nbhA : LastfmMain.hmFriends.get(A.getUserID())){
+			totalInfluence += calculateInfluence(A, LastfmMain.hmUser.get(nbhA));
 		}
 		
 		influence = influence / totalInfluence;
@@ -90,14 +90,40 @@ public class LastFm {
 		double influence = 0.0;
 		
 		HashSet<String> common = new HashSet<String>();
-		common.addAll(hmFriends.get(A.getID()));
-		common.retainAll(hmFriends.get(B.getID()));
+		common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
+		common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
 		
 		for (String c : common){
-			influence += (calculateInfluence(hmUser.get(c), A) + calculateInfluence(B, hmUser.get(c)));
+			influence += (calculateInfluence(LastfmMain.hmUser.get(c), A) + calculateInfluence(B, LastfmMain.hmUser.get(c)));
 		}
 		
 		influence = influence / common.size();
+		
+		return influence;
+	}
+
+	
+	// Calculate Average 3-hop Influence path length between User A and User B
+	public double calculateAvg3HopInfluencePathLength(User A, User B){
+		double influence = 0.0;
+		
+		// Get User A's neighbors that are not neighbors of User B
+		HashSet<String> noncommon = new HashSet<String>();
+		noncommon.addAll(LastfmMain.hmFriends.get(A.getUserID()));
+		noncommon.removeAll(LastfmMain.hmFriends.get(B.getUserID()));
+		
+		int count = 0;
+		for (String ncA : noncommon){
+			for (String nbhB : LastfmMain.hmFriends.get(A.getUserID())){
+				if (LastfmMain.hmFriends.get(ncA).contains(nbhB)){
+					count++;
+					influence += (calculateInfluence(LastfmMain.hmUser.get(ncA), A) + calculateInfluence(LastfmMain.hmUser.get(nbhB), LastfmMain.hmUser.get(ncA)) + calculateInfluence(B, LastfmMain.hmUser.get(nbhB)));
+				}
+			}
+			
+		}
+		
+		influence = influence / count;
 		
 		return influence;
 	}
