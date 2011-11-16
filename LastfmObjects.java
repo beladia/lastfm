@@ -17,7 +17,7 @@ public class LastfmObjects {
 	public String getTopArtistsByCountry(String key, String country) {
 		try{
 			String url = BASE_URL+"method=geo.gettopartists&country=spain&api_key="+key+"&limit=200";
-			System.out.println(url);
+			//System.out.println(url);
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
 			System.out.println(cr.toString());
@@ -51,7 +51,7 @@ public class LastfmObjects {
 	public ArrayList<String>  getEventsByLocation(String key, String location){
 		try{
 			String url = BASE_URL+"method=geo.getevents&location="+location+"&api_key="+key;
-			System.out.println(url);
+			//System.out.println(url);
 			ArrayList<String> events = new ArrayList<String>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
@@ -123,7 +123,7 @@ public class LastfmObjects {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getfriends&user=rj&api_key=b25b959554ed76058ac220.
 			String url = BASE_URL+"method=user.getfriends&user="+u+"&api_key="+key;
-			System.out.println(url);
+			//System.out.println(url);
 			HashSet<String> friends = new HashSet<String>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
@@ -157,14 +157,14 @@ public class LastfmObjects {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rj&api_key=b25b959554ed76058
 			String url = BASE_URL+"method=user.getrecenttracks&user="+u+"&api_key="+key;
-			System.out.println(url);
+			//System.out.println(url);
 			ArrayList<Track> tracks = new ArrayList<Track>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
 			//System.out.println(cr.toString());
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
-				String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"FriendListOf-"+u);
+				String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"tracksOf-"+u);
 				if(fileName != null){
 					Element docEle = LastfmObjectUtil.parseXmlFile(fileName);
 					NodeList nl = docEle.getElementsByTagName("track");
@@ -172,12 +172,14 @@ public class LastfmObjects {
 						for(int i = 0 ; i < nl.getLength();i++) {
 							Element el = (Element)nl.item(i);
 							Track track = new Track();
+							//System.out.println("track date "+LastfmObjectUtil.getDateValue(el, "date"));
 							track.setTimeofPlay(LastfmObjectUtil.getDateValue(el, "date"));
 							track.setName(LastfmObjectUtil.getTextValue(el, "name"));
 							String artist = LastfmObjectUtil.getTextValue(el, "artist");
 							String album = LastfmObjectUtil.getTextValue(el, "album");
 							track.setArtist(getArtistInfo(key, artist));
 							track.setAlbum(getAlbumInfo(key, album));
+							tracks.add(track);
 						}
 					}
 				}
@@ -210,8 +212,9 @@ public class LastfmObjects {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getfriends&user=rj&api_key=b25b959554ed76058ac220.
 			String url = BASE_URL+"method=user.getinfo&user="+u+"&api_key="+key;
-			Collection<Track> tracks = getUserTracks(key, u);
-			System.out.println(url);
+			Collection<Track> tracks = getUserTracks(key, u); 
+			//System.out.println("user "+u +" tracks "+ tracks.size());
+			//System.out.println(url);
 			User userInfo = new User();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
