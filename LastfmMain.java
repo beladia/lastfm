@@ -36,8 +36,10 @@ public class LastfmMain {
 				
 			}
 		}
-	System.out.println("size of friends map "+hmFriends.size());
-	System.out.println("size of user map "+hmUser.size());
+		System.out.println("size of friends map "+hmFriends.size());
+		System.out.println("size of user map "+hmUser.size());
+		LastFm.generateTrainData(outpath+"train.dat", 1000);
+	
 	
 	}
 }
