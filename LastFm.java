@@ -58,11 +58,14 @@ public class LastFm {
 		common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
 		common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
 
-		for (String c : common){
-			influence += calculateOverallInfluence(LastfmMain.hmUser.get(c));
+		if (common.size() > 0){
+			for (String c : common){
+				influence += calculateOverallInfluence(LastfmMain.hmUser.get(c));
+			}
+
+			influence = influence / common.size();
 		}
 
-		influence = influence / common.size();
 
 		return influence;
 	}
@@ -76,15 +79,17 @@ public class LastFm {
 		common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
 		common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
 
-		for (String c : common){
-			influence += calculateInfluence(A, LastfmMain.hmUser.get(c));
-		}
+		if (common.size() > 0){
+			for (String c : common){
+				influence += calculateInfluence(A, LastfmMain.hmUser.get(c));
+			}
 
-		for (String nbhA : LastfmMain.hmFriends.get(A.getUserID())){
-			totalInfluence += calculateInfluence(A, LastfmMain.hmUser.get(nbhA));
-		}
+			for (String nbhA : LastfmMain.hmFriends.get(A.getUserID())){
+				totalInfluence += calculateInfluence(A, LastfmMain.hmUser.get(nbhA));
+			}
 
-		influence = influence / totalInfluence;
+			influence = influence / totalInfluence;
+		}
 
 		return influence;
 	}	
@@ -97,11 +102,13 @@ public class LastFm {
 		common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
 		common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
 
-		for (String c : common){
-			influence += (calculateInfluence(LastfmMain.hmUser.get(c), A) + calculateInfluence(B, LastfmMain.hmUser.get(c)));
-		}
+		if (common.size() > 0){
+			for (String c : common){
+				influence += (calculateInfluence(LastfmMain.hmUser.get(c), A) + calculateInfluence(B, LastfmMain.hmUser.get(c)));
+			}
 
-		influence = influence / common.size();
+			influence = influence / common.size();
+		}
 
 		return influence;
 	}
@@ -117,17 +124,19 @@ public class LastFm {
 		noncommon.removeAll(LastfmMain.hmFriends.get(B.getUserID()));
 
 		int count = 0;
-		for (String ncA : noncommon){
-			for (String nbhB : LastfmMain.hmFriends.get(A.getUserID())){
-				if (LastfmMain.hmFriends.get(ncA).contains(nbhB)){
-					count++;
-					influence += (calculateInfluence(LastfmMain.hmUser.get(ncA), A) + calculateInfluence(LastfmMain.hmUser.get(nbhB), LastfmMain.hmUser.get(ncA)) + calculateInfluence(B, LastfmMain.hmUser.get(nbhB)));
+		if (noncommon.size() > 0) {
+			for (String ncA : noncommon){
+				for (String nbhB : LastfmMain.hmFriends.get(A.getUserID())){
+					if (LastfmMain.hmFriends.get(ncA).contains(nbhB)){
+						count++;
+						influence += (calculateInfluence(LastfmMain.hmUser.get(ncA), A) + calculateInfluence(LastfmMain.hmUser.get(nbhB), LastfmMain.hmUser.get(ncA)) + calculateInfluence(B, LastfmMain.hmUser.get(nbhB)));
+					}
 				}
+
 			}
 
+			influence = influence / count;
 		}
-
-		influence = influence / count;
 
 		return influence;
 	}
