@@ -172,7 +172,7 @@ public class LastFm {
 			conn0 = 0;
 			conn0Cnt = (int)trainSz/2;
 			conn1Cnt = (int)trainSz/2;
-			while(conn0 < conn0Cnt && conn1 < conn1Cnt){
+			while((conn0 < conn0Cnt) && (conn1 < conn1Cnt)){
 				while(true){
 					// Randomly pick 2 Users
 					u1 = rndGenerator.nextInt(users.size());
