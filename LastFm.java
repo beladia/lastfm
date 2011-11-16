@@ -176,7 +176,7 @@ public class LastFm {
 			conn0 = 0;
 			conn0Cnt = (int)trainSz/2;
 			conn1Cnt = (int)trainSz/2;
-			while(conn0 < conn0Cnt && conn1 < conn1Cnt){
+			while((conn0 < conn0Cnt) && (conn1 < conn1Cnt)){
 				while(true){
 					// Randomly pick 2 Users
 					u1 = rndGenerator.nextInt(users.size());
@@ -193,12 +193,12 @@ public class LastFm {
 						edgePair = u2 + "_" + u1;
 					}
 
-					if ((LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && conn1 >= conn1Cnt)
+					if ((LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && (conn1 >= conn1Cnt))
 						continue;
-					if (!(LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && conn0 >= conn0Cnt)
+					if (!(LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && (conn0 >= conn0Cnt))
 						continue;
 
-					if (u1 != u2 && !edgeList.contains(edgePair))
+					if ((u1 != u2) && !edgeList.contains(edgePair))
 						break;
 				}
 
