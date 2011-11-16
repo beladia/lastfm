@@ -136,7 +136,7 @@ public class LastFm {
 		HashSet<String> edgeList = new HashSet<String>();
 		int u1, u2;
 		String edgePair = null;
-		String user1, user2;
+		String user1, user2, connected;
 		
 		FileWriter fstream = null;
 		BufferedWriter out = null;
@@ -172,7 +172,11 @@ public class LastFm {
 				
 				// Generate features for training data
 				if (count == 1)
-					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \n");
+					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t connected \n");
+				
+				if (LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1))
+					connected = "1";
+				else connected = "0";
 				
 				out.write(user1 + "_" + user2 + " \t " +
  						  calculateOverallInfluence(LastfmMain.hmUser.get(user1)) + " \t " +
@@ -185,7 +189,9 @@ public class LastFm {
 						  calculateInfluenceOnCommonNeighbors(LastfmMain.hmUser.get(user1), LastfmMain.hmUser.get(user2)) + " \t " +
 						  calculateInfluenceOnCommonNeighbors(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \t " +
 						  calculateInfluence(LastfmMain.hmUser.get(user1), LastfmMain.hmUser.get(user2)) + " \t " +
-						  calculateInfluence(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \n"
+						  calculateInfluence(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \t " +
+						  connected +
+						  " \n"
 				);
 			}
 
