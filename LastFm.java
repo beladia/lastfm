@@ -33,7 +33,6 @@ public class LastFm {
 
 		// Get User A's friends
 		HashSet<String> friends = LastfmMain.hmFriends.get(A.getUserID());
-
 		// For each of User A's friend B, calculate influence(A, B)
 		for (String friend : friends){
 			B = LastfmMain.hmUser.get(friend);
@@ -130,7 +129,7 @@ public class LastFm {
 	}
 
 
-	public static void generateTrainData(String outpath, int trainSz) throws IOException{
+	public static void generateTrainData(String outpath, int trainSz) {
 		// Get List of all Users
 		List<String> users = new ArrayList<String>(LastfmMain.hmUser.keySet());
 		HashSet<String> edgeList = new HashSet<String>();
@@ -200,7 +199,11 @@ public class LastFm {
 			e.printStackTrace();
 		}
 		finally{
-			out.close();
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	} 
 }
