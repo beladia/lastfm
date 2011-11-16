@@ -61,7 +61,7 @@ public class Track {
 	
 	public boolean equals(Object o) {
 		if (o instanceof Track)
-			return this.ID.equals(((Track) o).getID());
+			return (this.name.toLowerCase().equals(((Track) o).getName().toLowerCase()) && this.artist.getName().toLowerCase().equals(((Track) o).getArtist().getName().toLowerCase()));
 		else return false;
 	}
 	
