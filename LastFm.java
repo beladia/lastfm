@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class LastFm {
-	//HashMap<String, HashSet<String>> hmFriends;
+	//HashMap<String, HashSet<String>> hmFriends;t
 	//HashMap<String, User> hmUser;	
 
 	// Calculate influence score of User A on User B
@@ -12,11 +12,15 @@ public class LastFm {
 		double influence = 0.0;
 
 		// Get Common Tracks played by User A and User B
+		//System.out.println("A's tracks "+ A.getHsTracks().size());
+		//System.out.println("B's tracks "+ B.getHsTracks().size());
 		for (Track at : A.getHsTracks()){
 			for (Track bt : B.getHsTracks()){
-				if (at.getTimeofPlay().before(bt.getTimeofPlay())){
-					System.out.println(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime());
-					influence += Math.exp(-1 * (at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
+				if(at.getTimeofPlay() != null && bt.getTimeofPlay() != null ){
+					//System.out.println("at.getTimeofPlay() "+at.getTimeofPlay()+"bt.getTimeofPlay()"+ bt.getTimeofPlay()+ at.getTimeofPlay().before(bt.getTimeofPlay()));
+					if (at.getTimeofPlay().before(bt.getTimeofPlay())){
+						influence += Math.exp(-1 * (at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
+					}
 				}
 			}
 		}
