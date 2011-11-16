@@ -1,10 +1,12 @@
 package lastfm;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+
+import org.json.JSONObject;
 
 public class LastfmMain {
 	public static String outpath = "/home/neera/lastfm-data/";
@@ -37,13 +39,13 @@ public class LastfmMain {
 					User userInfo = lastfmObj.getUserInfo(key, u);
 					hmUser.put(u, userInfo);
 					attendeeCnt ++;
-					if(attendeeCnt == 30)break;
+					//if(attendeeCnt == 30)break;
 				}
 				eventCount ++;
-				if(eventCount == 3)break;
+				//if(eventCount == 3)break;
 			}
 		}
-		System.out.println("size of friends map "+hmFriends.size()); 
+		/*System.out.println("size of friends map "+hmFriends.size()); 
 		Iterator<String> it = hmFriends.keySet().iterator();
 		while(it.hasNext()){
 			String key1 = it.next();
@@ -52,8 +54,18 @@ public class LastfmMain {
 			for(int k =0 ; k < friends.length; k++)
 				System.out.print("  "+friends[k]);
 			System.out.println();
-		}
+		}*/
  		
+		JSONObject jsonObject = new JSONObject( hmFriends );
+		try {
+			FileWriter file = new FileWriter(outpath+"hmfriends");
+			file.write(jsonObject.toString());
+			file.flush();
+			file.close();
+	 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		System.out.println("size of user map "+hmUser.size());
 		try {
 			LastFm.generateTrainData(outpath+"train.dat", 1000);

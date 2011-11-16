@@ -66,6 +66,6 @@ public class Track {
 	}
 	
 	public int hashCode() {
-		return this.ID.hashCode();
+		return this.name.hashCode();
 	}	
 }

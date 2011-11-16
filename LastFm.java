@@ -18,8 +18,9 @@ public class LastFm {
 			for (Track bt : B.getHsTracks()){
 				if(at.getTimeofPlay() != null && bt.getTimeofPlay() != null ){
 					if (at.equals(bt) && at.getTimeofPlay().before(bt.getTimeofPlay())){
-						System.out.println(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime());
-						influence += Math.exp(-1 * (at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
+						//System.out.println("track matched");
+						//System.out.println(bt.getTimeofPlay().getTime() - at.getTimeofPlay().getTime());
+						influence += Math.exp(-1 * (bt.getTimeofPlay().getTime() - at.getTimeofPlay().getTime())/(1000*60*60*24));
 
 					}
 				}
@@ -177,7 +178,7 @@ public class LastFm {
 			conn0 = 0;
 			conn0Cnt = (int)trainSz/2;
 			conn1Cnt = (int)trainSz/2;
-			while((conn0 < conn0Cnt) && (conn1 < conn1Cnt)){
+			while((conn0 < conn0Cnt) || (conn1 < conn1Cnt)){
 				while(true){
 					// Randomly pick 2 Users
 					u1 = rndGenerator.nextInt(users.size());
