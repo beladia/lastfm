@@ -180,6 +180,11 @@ public class LastFm {
 						edgePair = u2 + "_" + u1;
 					}
 
+					if ((LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && conn1 >= conn1Cnt)
+						continue;
+					if (!(LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && conn0 >= conn0Cnt)
+						continue;
+										
 					if (u1 != u2 && !edgeList.contains(edgePair))
 						break;
 				}
@@ -199,9 +204,6 @@ public class LastFm {
 					conn0++;
 				}
 				
-				if (conn1 >= conn1Cnt || conn0 >= conn0Cnt)
-					continue;
-
 				out.write(user1 + "_" + user2 + " \t " +
 						calculateOverallInfluence(LastfmMain.hmUser.get(user1)) + " \t " +
 						calculateOverallInfluence(LastfmMain.hmUser.get(user2)) + " \t " +
