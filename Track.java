@@ -59,5 +59,13 @@ public class Track {
 		this.album = album;
 	}
 	
+	public boolean equals(Object o) {
+		if (o instanceof Track)
+			return this.ID.equals(((Track) o).getID());
+		else return false;
+	}
 	
+	public int hashCode() {
+		return this.ID.hashCode();
+	}	
 }

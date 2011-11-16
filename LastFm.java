@@ -17,11 +17,10 @@ public class LastFm {
 		for (Track at : A.getHsTracks()){
 			for (Track bt : B.getHsTracks()){
 				if(at.getTimeofPlay() != null && bt.getTimeofPlay() != null ){
-					//System.out.println("at.getTimeofPlay() "+at.getTimeofPlay()+"bt.getTimeofPlay()"+ bt.getTimeofPlay()+ at.getTimeofPlay().before(bt.getTimeofPlay()));
-					if (at.getTimeofPlay().before(bt.getTimeofPlay())){
-						influence += Math.exp(-1 * (int)(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
-						//System.out.println("exp "+ -1*(int)(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
-						//System.out.println("influence "+influence);
+					if (at.equals(bt) && at.getTimeofPlay().before(bt.getTimeofPlay())){
+						System.out.println(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime());
+						influence += Math.exp(-1 * (at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
+
 					}
 				}
 			}
@@ -233,7 +232,7 @@ public class LastFm {
 						calculateInfluence(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \t " +
 						connected +
 						" \n"
-				);
+						);
 			}
 
 		}
