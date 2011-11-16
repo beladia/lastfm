@@ -119,12 +119,12 @@ public class LastfmObjects {
 		}
 	}
 
-	public ArrayList<String> getUserFriends(String key, String u) {
+	public HashSet<String> getUserFriends(String key, String u) {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getfriends&user=rj&api_key=b25b959554ed76058ac220.
 			String url = BASE_URL+"method=user.getfriends&user="+u+"&api_key="+key;
 			System.out.println(url);
-			ArrayList<String> friends = new ArrayList<String>();
+			HashSet<String> friends = new HashSet<String>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
 			//System.out.println(cr.toString());

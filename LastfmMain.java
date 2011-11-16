@@ -7,7 +7,7 @@ import java.util.HashSet;
 public class LastfmMain {
 	public static String outpath = "/home/neera/lastfm-data/";
 	//user -> list of friends
-	public static HashMap<String, ArrayList<String>> hmFriends = new HashMap<String, ArrayList<String>>();
+	public static HashMap<String, HashSet<String>> hmFriends = new HashMap<String, HashSet<String>>();
 	//user -> userobject;
 	public static HashMap<String, User> hmUser = new HashMap<String, User>();
 	
@@ -28,7 +28,7 @@ public class LastfmMain {
 				//get attendees for each events
 				ArrayList<String> attendees = lastfmObj.getAttendeesByEvents(key, e);
 				for(String u : attendees.toArray(new String[0])){
-					ArrayList<String> friends = lastfmObj.getUserFriends(key, u);
+					HashSet<String> friends = lastfmObj.getUserFriends(key, u);
 					hmFriends.put(u, friends);
 					User userInfo = lastfmObj.getUserInfo(key, u);
 					hmUser.put(u, userInfo);
