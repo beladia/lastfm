@@ -160,7 +160,7 @@ public class LastFm {
 	public static void generateTrainData(String outpath, int trainSz) throws IOException{
 		// Get List of all Users
 		List<String> users = new ArrayList<String>(LastfmMain.hmUser.keySet());
-		HashSet<String> edgeList = new HashSet<String>();
+		HashSet<String> edgeSet = new HashSet<String>();
 		int u1, u2, conn0, conn1, conn0Cnt, conn1Cnt;
 		String edgePair = null;
 		String user1, user2, connected;
@@ -200,10 +200,12 @@ public class LastFm {
 					if (!(LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && (conn0 >= conn0Cnt))
 						continue;
 
-					if ((u1 != u2) && !edgeList.contains(edgePair))
+					if ((u1 != u2) && !edgeSet.contains(edgePair))
 						break;
 				}
 
+				edgeSet.add(edgePair);
+				
 				count++;
 
 				// Generate features for training data
