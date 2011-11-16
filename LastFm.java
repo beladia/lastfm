@@ -14,7 +14,7 @@ public class LastFm {
 		// Get Common Tracks played by User A and User B
 		for (Track at : A.getHsTracks()){
 			for (Track bt : B.getHsTracks()){
-				if (at.getTimeofPlay().before(bt.getTimeofPlay())){
+				if (at.equals(bt) && at.getTimeofPlay().before(bt.getTimeofPlay())){
 					System.out.println(at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime());
 					influence += Math.exp(-1 * (at.getTimeofPlay().getTime() - bt.getTimeofPlay().getTime())/(1000*60*60*24));
 				}
