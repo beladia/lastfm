@@ -75,4 +75,14 @@ public class User {
 	public boolean removeTrack(Track track){
 		return this.hsTracks.remove(track);
 	}	
+	
+	public boolean equals(Object o) {
+		if (o instanceof User)
+			return this.ID.equals(((User) o).getUserID());
+		else return false;
+	}
+	
+	public int hashCode() {
+		return this.ID.hashCode();
+	}	
 }
