@@ -2,6 +2,7 @@ package lastfm;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import com.google.gson.Gson;
@@ -10,6 +11,33 @@ import com.google.gson.reflect.TypeToken;;
 public class LastFm {
 	//HashMap<String, HashSet<String>> hmFriends;t
 	//HashMap<String, User> hmUser;	
+	
+	
+	public static Date parseDate(String tp){
+		//2008-03-10 04:32
+		String dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
+		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+		try {
+			return sdf.parse(tp);
+		} catch (ParseException e) {
+			String dateFormat2 = "yyyy-mm-dd HH:mm";
+			SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);
+			try {
+				return sdf2.parse(tp);
+			} catch (ParseException e1) {
+				String dateFormat3 = "dd MMM yyyy, HH:mm";
+				SimpleDateFormat sdf3 = new SimpleDateFormat(dateFormat3);
+				try {
+					return sdf3.parse(tp);
+				} catch (ParseException e2) {				
+					e1.printStackTrace();
+				}
+			}
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}	
 
 	// Calculate influence score of User A on User B
 	public static double calculateInfluence(User A, User B){
@@ -21,10 +49,10 @@ public class LastFm {
 		for (Track at : A.getHsTracks()){
 			for (Track bt : B.getHsTracks()){
 				if(at.getTimeofPlay() != null && bt.getTimeofPlay() != null ){
-					if (at.equals(bt) && at.getTimeofPlay().before(bt.getTimeofPlay())){
+					if (at.equals(bt) && parseDate(at.getTimeofPlay()).before(parseDate(bt.getTimeofPlay()))){
 						//System.out.println("track matched");
 						//System.out.println(bt.getTimeofPlay().getTime() - at.getTimeofPlay().getTime());
-						influence += Math.exp(-1 * (bt.getTimeofPlay().getTime() - at.getTimeofPlay().getTime())/(1000*60*60*24));
+						influence += Math.exp(-1 * (parseDate(bt.getTimeofPlay()).getTime() - parseDate(at.getTimeofPlay()).getTime())/(1000*60*60*24));
 
 					}
 				}
@@ -203,20 +231,10 @@ public class LastFm {
 	public static void main(String[] args) throws IOException{		
 		String filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmUser";
 		HashMap<String, User> hmU = readUser(filePath);
+		filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmfriends";
+		HashMap<String, HashSet<String>> hmUF = readUserFriends(filePath);		
 		
-		int count = 0;
-		for(String key : hmU.keySet()){
-			System.out.println("User: "+key);
-				
-			for (Track t : hmU.get(key).getHsTracks())
-				System.out.printf("%s ", t.getName());
-					
-			System.out.println("");
-					
-			count++;
-			if (count >= 5)
-				break;
-		}
+		
 	}
 
 
