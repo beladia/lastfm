@@ -184,6 +184,7 @@ public class LastFm {
 					u1 = rndGenerator.nextInt(users.size());
 					u2 = rndGenerator.nextInt(users.size());
 
+					
 					if (u1 < u2){
 						user1 = users.get(u1);
 						user2 = users.get(u2);
