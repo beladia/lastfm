@@ -1,7 +1,10 @@
 package lastfm;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.*;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;;
 
 public class LastFm {
 	//HashMap<String, HashSet<String>> hmFriends;t
@@ -154,6 +157,60 @@ public class LastFm {
 		}
 
 		return influence;
+	}
+	
+	
+	private static String readFileAsString(String filePath) throws java.io.IOException{
+	    byte[] buffer = new byte[(int) new File(filePath).length()];
+	    BufferedInputStream f = null;
+	    try {
+	        f = new BufferedInputStream(new FileInputStream(filePath));
+	        f.read(buffer);
+	    } finally {
+	        if (f != null) try { f.close(); } catch (IOException ignored) { }
+	    }
+	    return new String(buffer);
+	}	
+	
+	
+	@SuppressWarnings("unchecked")
+	public static HashMap<String, ArrayList<String>> readUserFriends(String filePath) throws IOException{
+		HashMap<String, ArrayList<String>> hmUF = new HashMap<String, ArrayList<String>>();
+		
+		String jsonString = readFileAsString(filePath);
+		hmUF = (HashMap<String, ArrayList<String>>)new Gson().fromJson(jsonString, HashMap.class);
+		
+		return hmUF;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static HashMap<String, User> readUser(String filePath) throws IOException{
+		Type hmUType = new TypeToken<HashMap<String, User>>() {}.getType();
+		HashMap<String, User> hmU = new HashMap<String, User>();
+		
+		String jsonString = readFileAsString(filePath);
+		hmU = new Gson().fromJson(jsonString, hmUType);
+		
+		return hmU;
+	}	
+	
+	public static void main(String[] args) throws IOException{
+		String filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmUser";
+		HashMap<String, User> hmU = readUser(filePath);
+		
+		int count = 0;
+		for(String key : hmU.keySet()){
+			System.out.println("User: "+key);
+			
+			for (Track t : hmU.get(key).getHsTracks())
+				System.out.printf("%s ", t.getName());
+					
+			System.out.println("");
+					
+			count++;
+			if (count >= 5)
+				break;
+		}
 	}
 
 
