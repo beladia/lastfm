@@ -10,18 +10,17 @@ public class Track {
 	private int listeners, playCount;
 	private Artist artist;
 	private Album album;
-	private Date timeofPlay;
+	private String timeofPlay;
 
-	public Date getTimeofPlay() {
+	public String getTimeofPlay() {
 		return timeofPlay;
 	}
-	public void setTimeofPlay(Date timeofPlay) {
+	public void setTimeofPlay(String timeofPlay) {
 		this.timeofPlay = timeofPlay;
 	}
 
+	/*
 	public void setTimeofPlay(String tp){
-		if (tp == null) 
-			this.timeofPlay = null;
 		//2008-03-10 04:32
 		String dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
@@ -45,6 +44,8 @@ public class Track {
 			e.printStackTrace();
 		}	
 	}
+	
+	*/
 
 	public String getID() {
 		return ID;
