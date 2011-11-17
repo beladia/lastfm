@@ -2,6 +2,7 @@ package lastfm;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;;
@@ -174,11 +175,16 @@ public class LastFm {
 	
 	
 	@SuppressWarnings("unchecked")
-	public static HashMap<String, ArrayList<String>> readUserFriends(String filePath) throws IOException{
-		HashMap<String, ArrayList<String>> hmUF = new HashMap<String, ArrayList<String>>();
+	public static HashMap<String, HashSet<String>> readUserFriends(String filePath) throws IOException{
+		HashMap<String, ArrayList<String>> tmp;
+		HashMap<String, HashSet<String>> hmUF = new HashMap<String, HashSet<String>>();  
 		
 		String jsonString = readFileAsString(filePath);
-		hmUF = (HashMap<String, ArrayList<String>>)new Gson().fromJson(jsonString, HashMap.class);
+		tmp = (HashMap<String, ArrayList<String>>)new Gson().fromJson(jsonString, HashMap.class);
+		
+		for (String key : tmp.keySet()){
+			hmUF.put(key, new HashSet<String>(tmp.get(key)));
+		}
 		
 		return hmUF;
 	}
@@ -194,14 +200,14 @@ public class LastFm {
 		return hmU;
 	}	
 	
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException{		
 		String filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmUser";
 		HashMap<String, User> hmU = readUser(filePath);
 		
 		int count = 0;
 		for(String key : hmU.keySet()){
 			System.out.println("User: "+key);
-			
+				
 			for (Track t : hmU.get(key).getHsTracks())
 				System.out.printf("%s ", t.getName());
 					
