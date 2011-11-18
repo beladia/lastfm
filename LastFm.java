@@ -252,6 +252,30 @@ public class LastFm {
 		influence = Math.rint(influence * 1000.0d) / 1000.0d;
 		return influence;
 	}
+	
+	// Calculate Track Similarity between 2 users
+	public static double calculateTrackSimilarity(User A, User B){
+		double sim = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
+		
+		if ((A.getHsTracks().size() == 0) || (B.getHsTracks().size() == 0))
+			return 0.0;
+		
+		HashSet<Track> intersect = new HashSet<Track>();
+		intersect.addAll(A.getHsTracks());
+		intersect.retainAll(B.getHsTracks());
+		
+		HashSet<Track> union = new HashSet<Track>();
+		union.addAll(A.getHsTracks());
+		union.addAll(B.getHsTracks());
+		
+		sim = (double)intersect.size()/union.size();
+		sim = Math.rint(sim * 1000.0d) / 1000.0d;
+		
+		return sim;
+	}
 
 
 	private static String readFileAsString(String filePath) throws java.io.IOException{
@@ -398,7 +422,7 @@ public class LastFm {
 
 				// Generate features for training data
 				if (count == 1)
-					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t connected \n");
+					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t trackSim \t connected \n");
 
 				if ((hmFriends.get(user1) != null) || (hmFriends.get(user2) != null)) {
 					if (hmFriends.get(user1).contains(user2) || hmFriends.get(user2).contains(user1)){
@@ -427,6 +451,7 @@ public class LastFm {
 						calculateInfluenceOnCommonNeighbors(hmUser.get(user2), hmUser.get(user1)) + " \t " +
 						calculateInfluence(hmUser.get(user1), hmUser.get(user2)) + " \t " +
 						calculateInfluence(hmUser.get(user2), hmUser.get(user1)) + " \t " +
+						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1)) + " \t " +
 						connected +
 						" \n"
 				);
