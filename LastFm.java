@@ -9,9 +9,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;;
 
 public class LastFm {
-	//HashMap<String, HashSet<String>> hmFriends;t
+	//HashMap<String, HashSet<String>> hmFriends;
 	//HashMap<String, User> hmUser;	
 	
+	static HashMap<String, HashSet<String>>  hmFriends;
+	static HashMap<String, User> hmUser;	
 	
 	public static Date parseDate(String tp){
 		//2008-03-10 04:32
@@ -42,6 +44,10 @@ public class LastFm {
 	// Calculate influence score of User A on User B
 	public static double calculateInfluence(User A, User B){
 		double influence = 0.0;
+		double days;
+		
+		if ((A == null) || (B == null))
+			return 0.0;
 
 		// Get Common Tracks played by User A and User B
 		//System.out.println("A's tracks "+ A.getHsTracks().size());
@@ -52,14 +58,18 @@ public class LastFm {
 					if (at.equals(bt) && parseDate(at.getTimeofPlay()).before(parseDate(bt.getTimeofPlay()))){
 						//System.out.println("track matched");
 						//System.out.println(bt.getTimeofPlay().getTime() - at.getTimeofPlay().getTime());
-						influence += Math.exp(-1 * (parseDate(bt.getTimeofPlay()).getTime() - parseDate(at.getTimeofPlay()).getTime())/(1000*60*60*24));
-
+						days = (parseDate(bt.getTimeofPlay()).getTime() - parseDate(at.getTimeofPlay()).getTime())/(1000*60*60*24);
+						if (days == 0)
+							influence += 1;
+						else influence += Math.exp(-1 * days);
 					}
 				}
 			}
 		}
 
-		influence = influence / B.getHsTracks().size();		
+		if (influence > 0)
+			influence = influence / B.getHsTracks().size();	
+		influence = Math.rint(influence * 1000.0d) / 1000.0d;
 		return influence;		
 	}
 
@@ -71,19 +81,29 @@ public class LastFm {
 		User B;
 
 		// Get User A's friends
-		HashSet<String> friends = LastfmMain.hmFriends.get(A.getUserID());
+		HashSet<String> friends = null;
+		if (A != null)
+			friends = hmFriends.get(A.getUserID());
+		else return 0.0;
 
-		if (friends != null && friends.size() > 0){
+		if (friends != null && (friends.size() > 0)){
 			// For each of User A's friend B, calculate influence(A, B)
 			for (String friend : friends){
-				B = LastfmMain.hmUser.get(friend);
-				influence += (B.getHsTracks().size() * calculateInfluence(A, B));
-				weightSum += B.getHsTracks().size();
+				B = hmUser.get(friend);
+				if ((A != null) && (B != null)){
+					//System.out.printf("UserA = %s, User B = %s \n", A.getUserID(), B.getUserID());
+					//System.out.printf("UserA = %s, Tracks Played = %d.  User B = %s, Tracks Played = %d \n", A.getUserID(), A.getHsTracks().size(), B.getUserID(), B.getHsTracks().size());
+					influence += (B.getHsTracks().size() * calculateInfluence(A, B));
+					weightSum += B.getHsTracks().size();
+				}
 			}
 
-			influence = influence / weightSum;
+			if (influence > 0)
+				influence = influence / weightSum;
 		}
 		else influence = 0;
+		
+		influence = Math.rint(influence * 1000.0d) / 1000.0d;
 
 		return influence;		
 	}
@@ -92,19 +112,23 @@ public class LastFm {
 	// Calculate average influence of common neighbors of User A and User B
 	public static double calculateCommonNeighborAvgInfluence(User A, User B){
 		double influence = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
 
 		HashSet<String> common = new HashSet<String>();
-		if(LastfmMain.hmFriends.get(A.getUserID()) != null)
-			common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
-		if(LastfmMain.hmFriends.get(B.getUserID()) != null)
-			common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
+		if(hmFriends.get(A.getUserID()) != null)
+			common.addAll(hmFriends.get(A.getUserID()));
+		if(hmFriends.get(B.getUserID()) != null)
+			common.retainAll(hmFriends.get(B.getUserID()));
 
 		if (common.size() > 0){
 			for (String c : common){
-				influence += calculateOverallInfluence(LastfmMain.hmUser.get(c));
+				influence += calculateOverallInfluence(hmUser.get(c));
 			}
 
-			influence = influence / common.size();
+			if (influence > 0)
+				influence = influence / common.size();
 		}
 
 
@@ -115,24 +139,30 @@ public class LastFm {
 	public static double calculateInfluenceOnCommonNeighbors(User A, User B){
 		double influence = 0.0;
 		double totalInfluence = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
 
 		HashSet<String> common = new HashSet<String>();
-		if(LastfmMain.hmFriends.get(A.getUserID()) != null)
-			common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
-		if(LastfmMain.hmFriends.get(B.getUserID()) != null)
-			common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
+		if(hmFriends.get(A.getUserID()) != null)
+			common.addAll(hmFriends.get(A.getUserID()));
+		if(hmFriends.get(B.getUserID()) != null)
+			common.retainAll(hmFriends.get(B.getUserID()));
 
 		if (common.size() > 0){
 			for (String c : common){
-				influence += calculateInfluence(A, LastfmMain.hmUser.get(c));
+				influence += calculateInfluence(A, hmUser.get(c));
 			}
 
-			for (String nbhA : LastfmMain.hmFriends.get(A.getUserID())){
-				totalInfluence += calculateInfluence(A, LastfmMain.hmUser.get(nbhA));
+			for (String nbhA : hmFriends.get(A.getUserID())){
+				totalInfluence += calculateInfluence(A, hmUser.get(nbhA));
 			}
 
-			influence = influence / totalInfluence;
+			if (influence > 0)
+				influence = influence / totalInfluence;
 		}
+		
+		influence = Math.rint(influence * 1000.0d) / 1000.0d;
 
 		return influence;
 	}	
@@ -140,21 +170,26 @@ public class LastFm {
 	// Calculate Average 2-hop Influence path length between User A and User B
 	public static double calculateAvg2HopInfluencePathLength(User A, User B){
 		double influence = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
 
 		HashSet<String> common = new HashSet<String>();
-		if(LastfmMain.hmFriends.get(A.getUserID()) != null)
-			common.addAll(LastfmMain.hmFriends.get(A.getUserID()));
-		if(LastfmMain.hmFriends.get(B.getUserID()) != null)
-			common.retainAll(LastfmMain.hmFriends.get(B.getUserID()));
+		if(hmFriends.get(A.getUserID()) != null)
+			common.addAll(hmFriends.get(A.getUserID()));
+		if(hmFriends.get(B.getUserID()) != null)
+			common.retainAll(hmFriends.get(B.getUserID()));
 
 		if (common.size() > 0){
 			for (String c : common){
-				influence += (calculateInfluence(LastfmMain.hmUser.get(c), A) + calculateInfluence(B, LastfmMain.hmUser.get(c)));
+				influence += (calculateInfluence(hmUser.get(c), A) + calculateInfluence(B, hmUser.get(c)));
 			}
 
-			influence = influence / common.size();
+			if (influence > 0)
+				influence = influence / common.size();
 		}
 
+		influence = Math.rint(influence * 1000.0d) / 1000.0d;
 		return influence;
 	}
 
@@ -162,29 +197,36 @@ public class LastFm {
 	// Calculate Average 3-hop Influence path length between User A and User B
 	public static double calculateAvg3HopInfluencePathLength(User A, User B){
 		double influence = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
 
 		// Get User A's neighbors that are not neighbors of User B
 		HashSet<String> noncommon = new HashSet<String>();
-		if(LastfmMain.hmFriends.get(A.getUserID()) != null)
-			noncommon.addAll(LastfmMain.hmFriends.get(A.getUserID()));
-		if(LastfmMain.hmFriends.get(B.getUserID()) != null)
-			noncommon.removeAll(LastfmMain.hmFriends.get(B.getUserID()));
+		if(hmFriends.get(A.getUserID()) != null)
+			noncommon.addAll(hmFriends.get(A.getUserID()));
+		if(hmFriends.get(B.getUserID()) != null)
+			noncommon.removeAll(hmFriends.get(B.getUserID()));
 
 		int count = 0;
 		if (noncommon.size() > 0) {
 			for (String ncA : noncommon){
-				for (String nbhB : LastfmMain.hmFriends.get(A.getUserID())){
-					if (LastfmMain.hmFriends.get(ncA).contains(nbhB)){
-						count++;
-						influence += (calculateInfluence(LastfmMain.hmUser.get(ncA), A) + calculateInfluence(LastfmMain.hmUser.get(nbhB), LastfmMain.hmUser.get(ncA)) + calculateInfluence(B, LastfmMain.hmUser.get(nbhB)));
+				for (String nbhB : hmFriends.get(A.getUserID())){
+					if ((hmUser.get(ncA) != null) && (hmUser.get(nbhB) != null)){
+						if (hmFriends.get(ncA).contains(nbhB)){
+							count++;
+							influence += (calculateInfluence(hmUser.get(ncA), A) + calculateInfluence(hmUser.get(nbhB), hmUser.get(ncA)) + calculateInfluence(B, hmUser.get(nbhB)));
+						}
 					}
 				}
 
 			}
 
-			influence = influence / count;
+			if (influence > 0)
+				influence = influence / count;
 		}
 
+		influence = Math.rint(influence * 1000.0d) / 1000.0d;
 		return influence;
 	}
 	
@@ -225,22 +267,29 @@ public class LastFm {
 		String jsonString = readFileAsString(filePath);
 		hmU = new Gson().fromJson(jsonString, hmUType);
 		
+		for (String key : hmU.keySet()){
+			hmU.get(key).setUserID(key);
+			System.out.printf("User: %s, Tracks played=%d \n", key, hmU.get(key).getHsTracks().size());
+		}
+		
 		return hmU;
 	}	
 	
-	public static void main(String[] args) throws IOException{		
-		String filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmUser";
-		HashMap<String, User> hmU = readUser(filePath);
-		filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmfriends";
-		HashMap<String, HashSet<String>> hmUF = readUserFriends(filePath);		
+	public static void main(String[] args) throws IOException{				
+		String filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmUser_spain_21";
+		hmUser = readUser(filePath);
 		
+		filePath = "C:\\Users\\beladia\\workspace\\lastfm\\hmfriends_spain_21";
+		hmFriends = readUserFriends(filePath);		
 		
+		filePath = "C:\\Users\\beladia\\workspace\\lastfm\\traindata.dat";
+		generateTrainData(filePath, 50000);
 	}
 
 
 	public static void generateTrainData(String outpath, int trainSz) throws IOException{
 		// Get List of all Users
-		List<String> users = new ArrayList<String>(LastfmMain.hmUser.keySet());
+		List<String> users = new ArrayList<String>(hmUser.keySet());
 		HashSet<String> edgeSet = new HashSet<String>();
 		int u1, u2, conn0, conn1, conn0Cnt, conn1Cnt;
 		String edgePair = null;
@@ -259,7 +308,10 @@ public class LastFm {
 			conn0 = 0;
 			conn0Cnt = (int)trainSz/2;
 			conn1Cnt = (int)trainSz/2;
+			
+			int countLoop;
 			while((conn0 < conn0Cnt) || (conn1 < conn1Cnt)){
+				countLoop = 0;
 				while(true){
 					// Randomly pick 2 Users
 					u1 = rndGenerator.nextInt(users.size());
@@ -269,24 +321,44 @@ public class LastFm {
 					if (u1 < u2){
 						user1 = users.get(u1);
 						user2 = users.get(u2);
-						edgePair = u1 + "_" + u2;
+						edgePair = u1 + "#" + u2;
 					}
 					else {
 						user1 = users.get(u2);
 						user2 = users.get(u1);
-						edgePair = u2 + "_" + u1;
+						edgePair = u2 + "#" + u1;
 					}
 
-					if ((LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && (conn1 >= conn1Cnt))
-						continue;
-					if (!(LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)) && (conn0 >= conn0Cnt))
-						continue;
+					try{
+						if ((hmFriends.get(user1) != null) && (hmFriends.get(user2) != null)) {
+							if ((hmFriends.get(user1).contains(user2) || hmFriends.get(user2).contains(user1)) && (conn1 >= conn1Cnt))
+								continue;
+							if (!(hmFriends.get(user1).contains(user2) || hmFriends.get(user2).contains(user1)) && (conn0 >= conn0Cnt))
+								continue;						
+						}
 
-					if ((u1 != u2) && !edgeSet.contains(edgePair))
+					}
+					catch (Exception e){
+						e.printStackTrace();
+					}
+					
+					if (conn0 >= conn0Cnt){
+						if (hmFriends.get(user1) != null) {
+							user2 = (String) hmFriends.get(user1).toArray()[rndGenerator.nextInt(hmFriends.get(user1).size())];
+							//System.out.println("HERE :" + user2 +" isfriend="+hmFriends.get(user1).contains(user2));
+							break;
+						}
+					}
+
+					//System.out.printf("Count : %d, U1=%d, U2=%d \n", countLoop, u1, u2);
+					countLoop++;
+					if ((u1 != u2) && !edgeSet.contains(edgePair)) 
 						break;
+					
 				}
 
-				edgeSet.add(edgePair);
+				//edgeSet.add(edgePair);
+				System.out.printf("Count0 = %d, Count1 = %d \n", conn0, conn1);
 				
 				count++;
 
@@ -294,27 +366,33 @@ public class LastFm {
 				if (count == 1)
 					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t connected \n");
 
-				if (LastfmMain.hmFriends.get(user1).contains(user2) || LastfmMain.hmFriends.get(user2).contains(user1)){
-					connected = "1";
-					conn1++;
+				if ((hmFriends.get(user1) != null) || (hmFriends.get(user2) != null)) {
+					if (hmFriends.get(user1).contains(user2) || hmFriends.get(user2).contains(user1)){
+						connected = "1";
+						conn1++;
+					}
+					else {
+						connected = "0";
+						conn0++;
+					}					
 				}
 				else {
 					connected = "0";
 					conn0++;
 				}
 
-				out.write(user1 + "_" + user2 + " \t " +
-						calculateOverallInfluence(LastfmMain.hmUser.get(user1)) + " \t " +
-						calculateOverallInfluence(LastfmMain.hmUser.get(user2)) + " \t " +
-						calculateCommonNeighborAvgInfluence(LastfmMain.hmUser.get(user1), LastfmMain.hmUser.get(user2)) + " \t " +
-						calculateAvg2HopInfluencePathLength(LastfmMain.hmUser.get(user1), LastfmMain.hmUser.get(user2)) + " \t " +
-						calculateAvg2HopInfluencePathLength(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \t " +
-						calculateAvg3HopInfluencePathLength(LastfmMain.hmUser.get(user1), LastfmMain.hmUser.get(user2)) + " \t " +
-						calculateAvg3HopInfluencePathLength(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \t " +
-						calculateInfluenceOnCommonNeighbors(LastfmMain.hmUser.get(user1), LastfmMain.hmUser.get(user2)) + " \t " +
-						calculateInfluenceOnCommonNeighbors(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \t " +
-						calculateInfluence(LastfmMain.hmUser.get(user1), LastfmMain.hmUser.get(user2)) + " \t " +
-						calculateInfluence(LastfmMain.hmUser.get(user2), LastfmMain.hmUser.get(user1)) + " \t " +
+				out.write(user1 + "#" + user2 + " \t " +
+						calculateOverallInfluence(hmUser.get(user1)) + " \t " +
+						calculateOverallInfluence(hmUser.get(user2)) + " \t " +
+						calculateCommonNeighborAvgInfluence(hmUser.get(user1), hmUser.get(user2)) + " \t " +
+						calculateAvg2HopInfluencePathLength(hmUser.get(user1), hmUser.get(user2)) + " \t " +
+						calculateAvg2HopInfluencePathLength(hmUser.get(user2), hmUser.get(user1)) + " \t " +
+						calculateAvg3HopInfluencePathLength(hmUser.get(user1), hmUser.get(user2)) + " \t " +
+						calculateAvg3HopInfluencePathLength(hmUser.get(user2), hmUser.get(user1)) + " \t " +
+						calculateInfluenceOnCommonNeighbors(hmUser.get(user1), hmUser.get(user2)) + " \t " +
+						calculateInfluenceOnCommonNeighbors(hmUser.get(user2), hmUser.get(user1)) + " \t " +
+						calculateInfluence(hmUser.get(user1), hmUser.get(user2)) + " \t " +
+						calculateInfluence(hmUser.get(user2), hmUser.get(user1)) + " \t " +
 						connected +
 						" \n"
 						);
