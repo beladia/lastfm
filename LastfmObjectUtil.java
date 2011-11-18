@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,6 +46,7 @@ public class LastfmObjectUtil {
 
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
+		
 			Document dom = db.parse(fileName);
 			Element docEle = dom.getDocumentElement();
 
@@ -60,7 +62,29 @@ public class LastfmObjectUtil {
 		}
 		return null;
 	}
-	
+
+	public static Element parseXml(InputStream stream){
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+		
+			Document dom = db.parse(stream);
+			Element docEle = dom.getDocumentElement();
+
+			//NodeList nl = docEle.getElementsByTagName("artist");
+			return docEle;
+
+		}catch(ParserConfigurationException pce) {
+			pce.printStackTrace();
+		}catch(SAXException se) {
+			se.printStackTrace();
+		}catch(IOException ioe) {
+			ioe.printStackTrace();
+		}
+		return null;
+	}
+
 	public static String getTextValue(Element ele, String tagName) {
 		String textVal = null;
 		NodeList nl = ele.getElementsByTagName(tagName);
