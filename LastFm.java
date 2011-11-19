@@ -158,6 +158,42 @@ public class LastFm {
 		return influence;
 	}
 
+	
+	// Calculate average influence of common neighbors of User A and User B on User A/User B
+	public static double calculateInfluenceOfCommonNeighborAvgOn(User A, User B, String On){
+		double influence = 0.0;
+		User OnNode = null;
+		
+		if (On.toUpperCase().equals("A"))
+			OnNode = A;
+		else if (On.toUpperCase().equals("B"))
+			OnNode = B;
+
+		if ((A==null) || (B==null))
+			return 0.0;
+
+		HashSet<String> common = new HashSet<String>();
+		if(hmFriends.get(A.getUserID()) != null)
+			common.addAll(hmFriends.get(A.getUserID()));
+		if(hmFriends.get(B.getUserID()) != null)
+			common.retainAll(hmFriends.get(B.getUserID()));
+
+		if (common.size() > 0){
+			for (String c : common){
+				influence += calculateInfluence(hmUser.get(c), OnNode);
+			}
+
+			if (influence > 0)
+				influence = influence / common.size();
+		}
+
+		influence = Math.rint(influence * 1000.0d) / 1000.0d;
+		return influence;
+	}
+	
+	
+	
+
 	// Calculate User A's concentration of influence on common neighbors with User B vs. all neighbors
 	public static double calculateInfluenceOnCommonNeighbors(User A, User B){
 		double influence = 0.0;
@@ -254,7 +290,7 @@ public class LastFm {
 	}
 	
 	// Calculate Track Similarity between 2 users
-	public static double calculateTrackSimilarity(User A, User B){
+	public static double calculateTrackSimilarity(User A, User B, String wrto){
 		double sim = 0.0;
 		
 		if ((A==null) || (B==null))
@@ -267,11 +303,20 @@ public class LastFm {
 		intersect.addAll(A.getHsTracks());
 		intersect.retainAll(B.getHsTracks());
 		
-		HashSet<Track> union = new HashSet<Track>();
-		union.addAll(A.getHsTracks());
-		union.addAll(B.getHsTracks());
+		if (wrto.toUpperCase().equals("ALL")){
+			HashSet<Track> union = new HashSet<Track>();
+			union.addAll(A.getHsTracks());
+			union.addAll(B.getHsTracks());
+
+			sim = (double)intersect.size()/union.size();
+		}
+		else if (wrto.toUpperCase().equals("A")){
+			sim = (double)intersect.size()/A.getHsTracks().size();
+		}
+		else if (wrto.toUpperCase().equals("B")){
+			sim = (double)intersect.size()/B.getHsTracks().size();
+		}
 		
-		sim = (double)intersect.size()/union.size();
 		sim = Math.rint(sim * 1000.0d) / 1000.0d;
 		
 		return sim;
@@ -323,22 +368,23 @@ public class LastFm {
 	}	
 
 	public static void main(String[] args) throws IOException{				
-		/*String filePath = "/home/neera/lastfm-data/dumps/spain-data/hmUser_spain_21";
+		String prefixPath = "C:\\Users\\beladia\\workspace\\lastfm\\";
+		String filePath = prefixPath + "hmUser_spain_21";
 		hmUser = readUser(filePath);
-		hmUser.putAll(readUser("/home/neera/lastfm-data/dumps/spain-data/hmUser_spain_22"));
+		hmUser.putAll(readUser(prefixPath + "hmUser_spain_22"));
 		
-		filePath = "/home/neera/lastfm-data/dumps/spain-data/hmfriends_spain_21";
+		filePath = prefixPath + "hmfriends_spain_21";
 		hmFriends = readUserFriends(filePath);		
-		hmFriends.putAll(readUserFriends("/home/neera/lastfm-data/dumps/spain-data/hmfriends_spain_22"));*/
+		hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_22"));
 		
-		String filePath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
-		hmUser = readUser(filePath);
+		//String filePath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
+		//hmUser = readUser(filePath);
 		
-		filePath = "/home/neera/lastfm-data/dumps/UK-data/hmfriends_uk_1300users";
-		hmFriends = readUserFriends(filePath);		
+		//filePath = "/home/neera/lastfm-data/dumps/UK-data/hmfriends_uk_1300users";
+		//hmFriends = readUserFriends(filePath);		
 		
 		
-		filePath = "/home/neera/lastfm-data/dumps/UK-data/traindata.dat";
+		filePath = prefixPath + "traindata.dat";
 		generateTrainData(filePath, 20000);
 	}
 
@@ -422,7 +468,7 @@ public class LastFm {
 
 				// Generate features for training data
 				if (count == 1)
-					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t trackSim \t connected \n");
+					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t infCmnNbhOnA \t infCmnNbhOnB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t trackSimALL \t trackSimA \t trackSimB \t connected \n");
 
 				if ((hmFriends.get(user1) != null) || (hmFriends.get(user2) != null)) {
 					if (hmFriends.get(user1).contains(user2) || hmFriends.get(user2).contains(user1)){
@@ -443,6 +489,8 @@ public class LastFm {
 						calculateOverallInfluence(hmUser.get(user1)) + " \t " +
 						calculateOverallInfluence(hmUser.get(user2)) + " \t " +
 						calculateCommonNeighborAvgInfluence(hmUser.get(user1), hmUser.get(user2)) + " \t " +
+						calculateInfluenceOfCommonNeighborAvgOn(hmUser.get(user1), hmUser.get(user2), "A") + " \t " +
+						calculateInfluenceOfCommonNeighborAvgOn(hmUser.get(user1), hmUser.get(user2), "B") + " \t " +
 						calculateAvg2HopInfluencePathLength(hmUser.get(user1), hmUser.get(user2)) + " \t " +
 						calculateAvg2HopInfluencePathLength(hmUser.get(user2), hmUser.get(user1)) + " \t " +
 						calculateAvg3HopInfluencePathLength(hmUser.get(user1), hmUser.get(user2)) + " \t " +
@@ -451,7 +499,9 @@ public class LastFm {
 						calculateInfluenceOnCommonNeighbors(hmUser.get(user2), hmUser.get(user1)) + " \t " +
 						calculateInfluence(hmUser.get(user1), hmUser.get(user2)) + " \t " +
 						calculateInfluence(hmUser.get(user2), hmUser.get(user1)) + " \t " +
-						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1)) + " \t " +
+						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1), "ALL") + " \t " +
+						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1), "A") + " \t " +
+						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1), "B") + " \t " +
 						connected +
 						" \n"
 				);
