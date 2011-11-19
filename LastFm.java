@@ -299,23 +299,22 @@ public class LastFm {
 	}	
 
 	public static void main(String[] args) throws IOException{				
-		/*String filePath = "/home/neera/lastfm-data/dumps/spain-data/hmUser_spain_21";
+		String filePath = "/home/neera/lastfm-data/dumps/spain-data/hmUser_spain_21";
 		hmUser = readUser(filePath);
 		hmUser.putAll(readUser("/home/neera/lastfm-data/dumps/spain-data/hmUser_spain_22"));
 		
 		filePath = "/home/neera/lastfm-data/dumps/spain-data/hmfriends_spain_21";
 		hmFriends = readUserFriends(filePath);		
-		hmFriends.putAll(readUserFriends("/home/neera/lastfm-data/dumps/spain-data/hmfriends_spain_22"));*/
+		hmFriends.putAll(readUserFriends("/home/neera/lastfm-data/dumps/spain-data/hmfriends_spain_22"));
 		
-		String filePath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
+		/*String filePath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
 		hmUser = readUser(filePath);
 		
 		filePath = "/home/neera/lastfm-data/dumps/UK-data/hmfriends_uk_1300users";
-		hmFriends = readUserFriends(filePath);		
+		hmFriends = readUserFriends(filePath);*/		
 		
-		
-		filePath = "/home/neera/lastfm-data/dumps/UK-data/traindata.dat";
-		generateTrainData(filePath, 20000);
+		filePath = "/home/neera/lastfm-data/dumps/spain-data/traindata.dat";
+		generateTrainData(filePath, 50000);
 	}
 
 
