@@ -28,10 +28,14 @@ public class LastFm {
 	static HashMap<String, User> hmUser;	
 
 	public static Date parseDate(String tp){
+		if (tp == null)
+			return null;
+		
 		//2008-03-10 04:32
 		String dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
 		try {
+			//System.out.println("Date = "+tp);
 			return sdf.parse(tp);
 		} catch (ParseException e) {
 			String dateFormat2 = "yyyy-mm-dd HH:mm";
@@ -369,23 +373,26 @@ public class LastFm {
 
 	public static void main(String[] args) throws IOException{				
 		String prefixPath = "C:\\Users\\beladia\\workspace\\lastfm\\";
-		String filePath = prefixPath + "hmUser_spain_21";
+		String filePath = prefixPath + "hmUser_uk_1300users";
 		hmUser = readUser(filePath);
-		hmUser.putAll(readUser(prefixPath + "hmUser_spain_22"));
+		//hmUser.putAll(readUser(prefixPath + "hmUser_spain_22"));
 		
-		filePath = prefixPath + "hmfriends_spain_21";
+		filePath = prefixPath + "hmfriends_uk_1300users";
 		hmFriends = readUserFriends(filePath);		
-		hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_22"));
+		//hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_22"));
 		
 		//String filePath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
 		//hmUser = readUser(filePath);
 		
 		//filePath = "/home/neera/lastfm-data/dumps/UK-data/hmfriends_uk_1300users";
 		//hmFriends = readUserFriends(filePath);		
-		
+				
+		System.out.println("Average No. of Friends in the Network = " + LastfmStats.getAverageNumFriends());
+		LastfmStats.getDegreeDistribution(prefixPath + "FriendDistribution_uk1300.dat");
+		LastfmStats.getActivityDistribution(prefixPath + "TrackDistribution_uk1300.dat", prefixPath + "ActivityDistribution_uk1300.dat");
 		
 		filePath = prefixPath + "traindata.dat";
-		generateTrainData(filePath, 20000);
+		// generateTrainData(filePath, 20000);
 	}
 
 
