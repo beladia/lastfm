@@ -10,7 +10,8 @@ import java.util.Iterator;
 import org.json.JSONObject;
 
 public class LastfmMain {
-	public static String outpath = "/home/neera/lastfm-data/";
+	//public static String outpath = "/home/neera/lastfm-data/";
+	public static String outpath = "";
 	//user -> list of friends
 	public static HashMap<String, HashSet<String>> hmFriends = new HashMap<String, HashSet<String>>();
 	//user -> userobject;
@@ -28,7 +29,7 @@ public class LastfmMain {
 		int eventCount = 0;
 		int userCnt = 0;
 		ArrayList<String> events = new ArrayList<String>(); 
-		ArrayList<String> spainEvents = lastfmObj.getEventsByLocation(key, "spain");
+		ArrayList<String> spainEvents = lastfmObj.getEventsByLocation(key, "UK");
 		//ArrayList<String> franceEvents = lastfmObj.getEventsByLocation(key, "france");
 		//ArrayList<String> usEvents = lastfmObj.getEventsByLocation(key, "US");
 		//ArrayList<String> ukEvents = lastfmObj.getEventsByLocation(key, "UK");
@@ -40,8 +41,8 @@ public class LastfmMain {
 		if(events != null && events.size() > 0){
 			int eventNo = events.size();
 			String[] eventsArr = events.toArray(new String[0]);
-			for(int x = eventNo-10 ; x > 0; x--){
-			//for(int x = 0 ; x < eventNo-1; x++){
+			//for(int x = eventNo-10 ; x > 0; x--){
+			for(int x = 0 ; x < eventNo-1; x++){
 				//get attendees for each events
 				String e = eventsArr[x];
 				System.out.println("processing for event id:: "+e);
@@ -112,12 +113,12 @@ public class LastfmMain {
 		JSONObject friendsJsonObject = new JSONObject( hmFriends );
 		JSONObject userJsonObject = new JSONObject( hmUserForJson );
 		try {	
-			FileWriter friendsFile = new FileWriter(outpath+"dumps/hmfriends_spain_"+count);
+			FileWriter friendsFile = new FileWriter(outpath+"dumps/hmfriends_uk_"+count);
 			friendsFile.write(friendsJsonObject.toString());
 			friendsFile.flush();
 			friendsFile.close();
 
-			FileWriter userFile = new FileWriter(outpath+"dumps/hmUser_spain_"+count);
+			FileWriter userFile = new FileWriter(outpath+"dumps/hmUser_uk_"+count);
 			userFile.write(userJsonObject.toString());
 			userFile.flush();
 			userFile.close();

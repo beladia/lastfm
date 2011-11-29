@@ -86,8 +86,8 @@ public class LastfmObjects {
 			}
 			else{
 				System.err.println("error in fetching us top artists");
-				JSONObject response = (JSONObject) new JSONObject(cr.getEntity(String.class)).get("response");
-				System.err.println(response.toString());
+				//JSONObject response = (JSONObject) new JSONObject(cr.getEntity(String.class)).get("response");
+				//System.err.println(response.toString());
 				return null;
 			}
 		}catch(Exception e){
@@ -165,8 +165,8 @@ public class LastfmObjects {
 			}
 			else{
 				System.err.println("error in fetching friends");
-				JSONObject response = (JSONObject) new JSONObject(cr.getEntity(String.class)).get("response");
-				System.err.println(response.getString("error"));
+				//JSONObject response = (JSONObject) new JSONObject(cr.getEntity(String.class)).get("response");
+				//System.err.println(response.getString("error"));
 				return null;
 			}
 		}catch(Exception e){
@@ -231,8 +231,6 @@ public class LastfmObjects {
 			}
 			else{
 				System.err.println("error in fetching user tracks...ignoring");
-				JSONObject response = (JSONObject) new JSONObject(cr.getEntity(String.class)).get("response");
-				//System.err.println(response.getString("error"));
 				return null;
 			}
 		}catch(Exception e){
@@ -276,11 +274,8 @@ public class LastfmObjects {
 			return trackTags.toString();
 		}else{
 			System.err.println("error in fetching user tracks...ignoring");
-			JSONObject response = (JSONObject) new JSONObject(cr.getEntity(String.class)).get("response");
-			System.err.println(response.getString("error"));
+			return null;	
 		}
-		cr.close();
-		return null;		//<toptags>
 	}
 
 	public Artist getArtistInfo(String key, String artist){
@@ -304,7 +299,6 @@ public class LastfmObjects {
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
-				//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"InfoOfUser-"+u);
 				if(resString != null){
 					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
 					Element docEle = LastfmObjectUtil.parseXml(bs);
