@@ -33,16 +33,11 @@ public class LastfmObjects {
 	public String getTopArtistsByCountry(String key, String country) {
 		try{
 			String url = BASE_URL+"method=geo.gettopartists&country=spain&api_key="+key+"&limit=2000";
-			//System.out.println(url);
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
-			//System.out.println(cr.toString());
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
-				//String fileName = "/home/neera/topArtists";
-				//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"topArtists");
 				if(resString != null){
-					//Element docEle = LastfmObjectUtil.parseXmlFile(fileName);
 					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("artist");
@@ -50,7 +45,6 @@ public class LastfmObjects {
 						for(int i = 0 ; i < nl.getLength();i++) {
 							Element el = (Element)nl.item(i);
 							System.out.println(LastfmObjectUtil.getTextValue(el, "name"));
-							//TODO populate artist object here....
 						}
 					}
 				}
@@ -73,7 +67,6 @@ public class LastfmObjects {
 			ArrayList<String> events = new ArrayList<String>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
-			//System.out.println(cr.toString());
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
 				//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"eventsAt"+location);
@@ -84,7 +77,6 @@ public class LastfmObjects {
 					if(nl != null && nl.getLength() > 0) {
 						for(int i = 0 ; i < nl.getLength();i++) {
 							Element el = (Element)nl.item(i);
-							//System.out.println(LastfmObjectUtil.getTextValue(el, "title"));
 							events.add(LastfmObjectUtil.getTextValue(el, "id"));
 
 						}
@@ -144,6 +136,9 @@ public class LastfmObjects {
 	public HashSet<String> getUserFriends(String key, String u) {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getfriends&user=rj&api_key=b25b959554ed76058ac220.
+			if(LastfmMain.hmFriends.containsKey(u)){
+				return LastfmMain.hmFriends.get(u);
+			}
 			String subStr = "method=user.getfriends&user="+URLEncoder.encode(u, "UTF-8")+"&api_key="+key+"&limit=1000";
 			//String url = BASE_URL+URLEncoder.encode(subStr, "UTF-8");
 			String url = BASE_URL+subStr;
@@ -183,6 +178,9 @@ public class LastfmObjects {
 	public Set<Track> getUserTracks(String key, String u) {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rj&api_key=b25b959554ed76058
+			if(LastfmMain.hmUser.containsKey(u)){
+				return LastfmMain.hmUser.get(u).getHsTracks();
+			}
 			String url = BASE_URL+"method=user.getrecenttracks&user="+u+"&api_key="+key+"&limit=200";
 			//System.out.println(url);
 			HashMap<Track, String> tracks = new HashMap<Track, String>();
@@ -245,8 +243,6 @@ public class LastfmObjects {
 
 
 	private String getTrackTagName(String trackName, String artist, String key) throws UnsupportedEncodingException, ClientHandlerException, UniformInterfaceException, JSONException {
-
-		//http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026...
 		if(LastfmMain.hmTrackTags.containsKey(trackName)){
 			return LastfmMain.hmTrackTags.get(trackName);
 		}
@@ -254,11 +250,10 @@ public class LastfmObjects {
 		String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist, "UTF-8");
 		StringBuffer trackTags = new StringBuffer();
 		WebResource webResource = client.resource(url);
-		System.out.println("getting tag name " + url);
 		ClientResponse cr =  webResource.get(ClientResponse.class);;
 		if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 			String resString = cr.getEntity(String.class);
-			String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"tracksOf-tag-"+trackName);
+			//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"tracksOf-tag-"+trackName);
 			if(resString != null){
 				ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
 				Element docEle = LastfmObjectUtil.parseXml(bs);
@@ -267,12 +262,10 @@ public class LastfmObjects {
 					for(int i = 0 ; i < nl.getLength();i++) {
 						Element el = (Element) nl.item(i);
 						NodeList tagName  =  el.getElementsByTagName("tag");
-						//System.out.println(tagName.getLength());
 						for(int j = 0; j < tagName.getLength(); j++){
 							Element tag = (Element)tagName.item(j);
 							String trkTag =  LastfmObjectUtil.getTextValue(tag, "name");
 							if(trkTag != null){
-								//System.out.println("TAG =="+trkTag);
 								trackTags.append(trkTag+";");
 							}
 						}
