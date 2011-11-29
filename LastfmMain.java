@@ -15,6 +15,7 @@ public class LastfmMain {
 	public static HashMap<String, HashSet<String>> hmFriends = new HashMap<String, HashSet<String>>();
 	//user -> userobject;
 	public static HashMap<String, User> hmUser = new HashMap<String, User>();
+	public static HashMap<String, String> hmTrackTags = new HashMap<String, String>();
 
 
 	public static void main(String[] args){

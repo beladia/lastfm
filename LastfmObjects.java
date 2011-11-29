@@ -28,7 +28,7 @@ import com.sun.jersey.api.client.WebResource;
 public class LastfmObjects {
 	private static final String BASE_URL = "http://ws.audioscrobbler.com/2.0/?";
 	Client client = JerseyClient.getClient();
-	private static int NOOFEVENTS = 100; 
+	private static int NOOFEVENTS = 1000; 
 
 	public String getTopArtistsByCountry(String key, String country) {
 		try{
@@ -107,8 +107,8 @@ public class LastfmObjects {
 
 	public ArrayList<String> getAttendeesByEvents(String key, String eventId) {
 		try{
-			String url = BASE_URL+"method=event.getattendees&event="+eventId+"&api_key="+key+"&limit=1000";
-			//System.out.println(url);
+			String url = BASE_URL+"method=event.getattendees&event="+eventId+"&api_key="+key+"&limit=5000";
+			System.out.println(url);
 			ArrayList<String> attendees = new ArrayList<String>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
@@ -144,7 +144,7 @@ public class LastfmObjects {
 	public HashSet<String> getUserFriends(String key, String u) {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getfriends&user=rj&api_key=b25b959554ed76058ac220.
-			String subStr = "method=user.getfriends&user="+u+"&api_key="+key+"&limit=1000";
+			String subStr = "method=user.getfriends&user="+URLEncoder.encode(u, "UTF-8")+"&api_key="+key+"&limit=1000";
 			//String url = BASE_URL+URLEncoder.encode(subStr, "UTF-8");
 			String url = BASE_URL+subStr;
 			System.out.println(url);
@@ -247,6 +247,9 @@ public class LastfmObjects {
 	private String getTrackTagName(String trackName, String artist, String key) throws UnsupportedEncodingException, ClientHandlerException, UniformInterfaceException, JSONException {
 
 		//http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026...
+		if(LastfmMain.hmTrackTags.containsKey(trackName)){
+			return LastfmMain.hmTrackTags.get(trackName);
+		}
 		String subStr = "track="+trackName+"&artist="+artist;
 		String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist, "UTF-8");
 		StringBuffer trackTags = new StringBuffer();
@@ -276,6 +279,7 @@ public class LastfmObjects {
 					}
 				}
 			}
+			LastfmMain.hmTrackTags.put(trackName, trackTags.toString());
 			return trackTags.toString();
 		}else{
 			System.err.println("error in fetching user tracks...ignoring");
