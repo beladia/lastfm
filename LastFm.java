@@ -31,6 +31,8 @@ public class LastFm {
 		if (tp == null)
 			return null;
 		
+		//System.out.println("Time = "+tp);
+		
 		//2008-03-10 04:32
 		String dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
@@ -39,19 +41,21 @@ public class LastFm {
 			return sdf.parse(tp);
 		} catch (ParseException e) {
 			String dateFormat2 = "yyyy-mm-dd HH:mm";
-			SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);
+			SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);			
 			try {
-				return sdf2.parse(tp);
+				//System.out.println("Date processed under sdf2 = "+sdf2.parse(tp));
+				return sdf2.parse(tp);				
 			} catch (ParseException e1) {
 				String dateFormat3 = "dd MMM yyyy, HH:mm";
 				SimpleDateFormat sdf3 = new SimpleDateFormat(dateFormat3);
 				try {
+					//System.out.println("Date processed under sdf3 = "+sdf3.parse(tp));
 					return sdf3.parse(tp);
 				} catch (ParseException e2) {				
 					e1.printStackTrace();
 				}
 			}
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		return null;
@@ -303,6 +307,7 @@ public class LastFm {
 		if ((A.getHsTracks().size() == 0) || (B.getHsTracks().size() == 0))
 			return 0.0;
 		
+		// Intersection set for numerator for Jaccard sim calculation		
 		HashSet<Track> intersect = new HashSet<Track>();
 		intersect.addAll(A.getHsTracks());
 		intersect.retainAll(B.getHsTracks());
@@ -325,7 +330,210 @@ public class LastFm {
 		
 		return sim;
 	}
+	
+	// Calculate similarity between users based on tag similarity
+	public static double calculateTagSimilarity(User A, User B, String wrto){
+		double sim = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
+		
+		if ((A.getHsTracks().size() == 0) || (B.getHsTracks().size() == 0))
+			return 0.0;
+		
+		HashSet<String> ATags = new HashSet<String>();
+		HashSet<String> BTags = new HashSet<String>();
+		
+		// Add all unique tags related to tracks listened to by User A to ATags
+		for (Track t : A.getHsTracks()) {
+			if (t.getTags() != null) 
+				ATags.addAll(t.getTags());			
+		}
+		
+		// Add all unique tags related to tracks listened to by User B to BTags
+		for (Track t : B.getHsTracks()) {
+			if (t.getTags() != null) 
+				BTags.addAll(t.getTags());			
+		}
+		
+		if ((ATags.size() == 0) || (BTags.size() == 0))
+			return 0.0;
+		
+		// Intersection set for numerator for Jaccard sim calculation		
+		HashSet<String> intersect = new HashSet<String>();
+		intersect.addAll(ATags);
+		intersect.retainAll(BTags);
+		
+		if (wrto.toUpperCase().equals("ALL")){
+			HashSet<String> union = new HashSet<String>();
+			union.addAll(ATags);
+			union.addAll(BTags);
 
+			sim = (double)intersect.size()/union.size();
+		}
+		else if (wrto.toUpperCase().equals("A")){
+			sim = (double)intersect.size()/ATags.size();
+		}
+		else if (wrto.toUpperCase().equals("B")){
+			sim = (double)intersect.size()/BTags.size();
+		}
+		
+		sim = Math.rint(sim * 1000.0d) / 1000.0d;
+		
+		return sim;
+	}
+	
+	
+	// Calculate similarity between users based on Artist similarity
+	public static double calculateArtistSimilarity(User A, User B, String wrto){
+		double sim = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
+		
+		if ((A.getHsTracks().size() == 0) || (B.getHsTracks().size() == 0))
+			return 0.0;
+		
+		HashSet<String> Aartists = new HashSet<String>();
+		HashSet<String> Bartists = new HashSet<String>();
+		
+		// Add all unique artists related to tracks listened to by User A to Aartists
+		for (Track t : A.getHsTracks()) {
+			if (t.getArtist() != null)
+				Aartists.add(t.getArtist().getName().toLowerCase());
+		}
+		
+		// Add all unique artists related to tracks listened to by User B to Aartists
+		for (Track t : B.getHsTracks()) {
+			if (t.getArtist() != null)
+				Bartists.add(t.getArtist().getName().toLowerCase());
+		}
+		
+		if ((Aartists.size() == 0) || (Bartists.size() == 0))
+			return 0.0;
+		
+		
+		// Intersection set for numerator for Jaccard sim calculation
+		HashSet<String> intersect = new HashSet<String>();
+		intersect.addAll(Aartists);
+		intersect.retainAll(Bartists);
+		
+		if (wrto.toUpperCase().equals("ALL")){
+			HashSet<String> union = new HashSet<String>();
+			union.addAll(Aartists);
+			union.addAll(Bartists);
+
+			sim = (double)intersect.size()/union.size();
+		}
+		else if (wrto.toUpperCase().equals("A")){
+			sim = (double)intersect.size()/Aartists.size();
+		}
+		else if (wrto.toUpperCase().equals("B")){
+			sim = (double)intersect.size()/Bartists.size();
+		}
+		
+		sim = Math.rint(sim * 1000.0d) / 1000.0d;
+		
+		return sim;
+	}	
+
+	
+	// Calculate similarity between users based on Album similarity
+	public static double calculateAlbumSimilarity(User A, User B, String wrto){
+		double sim = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
+		
+		if ((A.getHsTracks().size() == 0) || (B.getHsTracks().size() == 0))
+			return 0.0;
+		
+		HashSet<String> Aalbums = new HashSet<String>();
+		HashSet<String> Balbums = new HashSet<String>();
+		
+		// Add all unique albums related to tracks listened to by User A to Aalbums
+		for (Track t : A.getHsTracks()) {
+			if (t.getAlbum() != null) {
+				if (t.getAlbum().getName() != null)
+					Aalbums.add(t.getAlbum().getName().toLowerCase());
+			}
+		}
+		
+		// Add all unique albums related to tracks listened to by User B to Aartists
+		for (Track t : B.getHsTracks()) {
+			if (t.getAlbum() != null) {
+				if (t.getAlbum().getName() != null)
+					Balbums.add(t.getAlbum().getName().toLowerCase());
+			}
+		}
+		
+		if ((Aalbums.size() == 0) || (Balbums.size() == 0))
+			return 0.0;
+		
+		
+		// Intersection set for numerator for Jaccard sim calculation
+		HashSet<String> intersect = new HashSet<String>();
+		intersect.addAll(Aalbums);
+		intersect.retainAll(Balbums);
+		
+		if (wrto.toUpperCase().equals("ALL")){
+			HashSet<String> union = new HashSet<String>();
+			union.addAll(Aalbums);
+			union.addAll(Balbums);
+
+			sim = (double)intersect.size()/union.size();
+		}
+		else if (wrto.toUpperCase().equals("A")){
+			sim = (double)intersect.size()/Aalbums.size();
+		}
+		else if (wrto.toUpperCase().equals("B")){
+			sim = (double)intersect.size()/Balbums.size();
+		}
+		
+		sim = Math.rint(sim * 1000.0d) / 1000.0d;
+		
+		return sim;
+	}	
+	
+	
+	
+	// Calculate similarity between users based on Friend similarity
+	public static double calculateFriendSimilarity(User A, User B, String wrto){
+		double sim = 0.0;
+		
+		if ((A==null) || (B==null))
+			return 0.0;
+		
+		if ((hmFriends.get(A.getUserID()) == null) || (hmFriends.get(B.getUserID()) == null))
+			return 0.0;
+		
+		if ((hmFriends.get(A.getUserID()).size() == 0) || (hmFriends.get(B.getUserID()).size() == 0))
+			return 0.0;
+		
+		
+		// Intersection set for numerator for Jaccard sim calculation
+		HashSet<String> intersect = new HashSet<String>();
+		intersect.addAll(hmFriends.get(A.getUserID()));
+		intersect.retainAll(hmFriends.get(B.getUserID()));
+		
+		if (wrto.toUpperCase().equals("ALL")){
+			HashSet<String> union = new HashSet<String>();
+			union.addAll(hmFriends.get(A.getUserID()));
+			union.addAll(hmFriends.get(B.getUserID()));
+
+			sim = (double)intersect.size()/union.size();
+		}
+		else if (wrto.toUpperCase().equals("A")){
+			sim = (double)intersect.size()/hmFriends.get(A.getUserID()).size();
+		}
+		else if (wrto.toUpperCase().equals("B")){
+			sim = (double)intersect.size()/hmFriends.get(B.getUserID()).size();
+		}
+		
+		sim = Math.rint(sim * 1000.0d) / 1000.0d;
+		
+		return sim;
+	}		
 
 	private static String readFileAsString(String filePath) throws java.io.IOException{
 		byte[] buffer = new byte[(int) new File(filePath).length()];
@@ -342,6 +550,7 @@ public class LastFm {
 
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, HashSet<String>> readUserFriends(String filePath) throws IOException{
+		System.out.println("Processing : "+filePath);
 		HashMap<String, ArrayList<String>> tmp;
 		HashMap<String, HashSet<String>> hmUF = new HashMap<String, HashSet<String>>();  
 
@@ -349,13 +558,15 @@ public class LastFm {
 		tmp = (HashMap<String, ArrayList<String>>)new Gson().fromJson(jsonString, HashMap.class);
 
 		for (String key : tmp.keySet()){
-			hmUF.put(key, new HashSet<String>(tmp.get(key)));
+			System.out.println("key = "+key);
+			if (tmp.get(key) == null)
+				hmUF.put(key, new HashSet<String>());
+			else hmUF.put(key, new HashSet<String>(tmp.get(key)));
 		}
 
 		return hmUF;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static HashMap<String, User> readUser(String filePath) throws IOException{
 		Type hmUType = new TypeToken<HashMap<String, User>>() {}.getType();
 		HashMap<String, User> hmU = new HashMap<String, User>();
@@ -365,21 +576,25 @@ public class LastFm {
 
 		for (String key : hmU.keySet()){
 			hmU.get(key).setUserID(key);
-			System.out.printf("User: %s, Tracks played=%d \n", key, hmU.get(key).getHsTracks().size());
+			// System.out.printf("User: %s, Tracks played=%d \n", key, hmU.get(key).getHsTracks().size());
 		}
 
 		return hmU;
 	}	
 
 	public static void main(String[] args) throws IOException{				
-		String prefixPath = "C:\\Users\\beladia\\workspace\\lastfm\\";
-		String filePath = prefixPath + "hmUser_uk_1300users";
+		String prefixPath = "C:\\Users\\beladia\\workspace\\lastfm\\datazips\\spain-data-with-tags\\spain-data-with-tags\\";
+		String filePath = prefixPath + "hmUser_spain_2";
 		hmUser = readUser(filePath);
-		//hmUser.putAll(readUser(prefixPath + "hmUser_spain_22"));
+		hmUser.putAll(readUser(prefixPath + "hmUser_spain_3"));
+		hmUser.putAll(readUser(prefixPath + "hmUser_spain_4"));
+		hmUser.putAll(readUser(prefixPath + "hmUser_spain_6"));
 		
-		filePath = prefixPath + "hmfriends_uk_1300users";
+		filePath = prefixPath + "hmfriends_spain_2";
 		hmFriends = readUserFriends(filePath);		
-		//hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_22"));
+		hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_3"));
+		hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_4"));
+		hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_6"));
 		
 		//String filePath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
 		//hmUser = readUser(filePath);
@@ -387,12 +602,12 @@ public class LastFm {
 		//filePath = "/home/neera/lastfm-data/dumps/UK-data/hmfriends_uk_1300users";
 		//hmFriends = readUserFriends(filePath);		
 				
-		System.out.println("Average No. of Friends in the Network = " + LastfmStats.getAverageNumFriends());
-		LastfmStats.getDegreeDistribution(prefixPath + "FriendDistribution_uk1300.dat");
-		LastfmStats.getActivityDistribution(prefixPath + "TrackDistribution_uk1300.dat", prefixPath + "ActivityDistribution_uk1300.dat");
+		//System.out.println("Average No. of Friends in the Network = " + LastfmStats.getAverageNumFriends());
+		//LastfmStats.getDegreeDistribution(prefixPath + "FriendDistribution_uk1300.dat");
+		//LastfmStats.getActivityDistribution(prefixPath + "TrackDistribution_uk1300.dat", prefixPath + "ActivityDistribution_uk1300.dat");
 		
-		filePath = prefixPath + "traindata.dat";
-		// generateTrainData(filePath, 20000);
+		filePath = prefixPath + "traindata_tags_spain234.dat";
+		generateTrainData(filePath, 10000);
 	}
 
 
@@ -400,7 +615,7 @@ public class LastFm {
 		// Get List of all Users
 		List<String> users = new ArrayList<String>(hmUser.keySet());
 		HashSet<String> edgeSet = new HashSet<String>();
-		int u1, u2, conn0, conn1, conn0Cnt, conn1Cnt;
+		int u1, u2, conn0, conn1, conn0Cnt, conn1Cnt, countLoop;
 		String edgePair = null;
 		String user1, user2, connected;
 
@@ -418,10 +633,10 @@ public class LastFm {
 			conn0Cnt = (int)trainSz/2;
 			conn1Cnt = (int)trainSz/2;
 
-			int countLoop;
 			while((conn0 < conn0Cnt) || (conn1 < conn1Cnt)){
 				countLoop = 0;
 				while(true){
+					countLoop++;
 					// Randomly pick 2 Users
 					u1 = rndGenerator.nextInt(users.size());
 					u2 = rndGenerator.nextInt(users.size());
@@ -459,23 +674,38 @@ public class LastFm {
 					}*/
 
 					//System.out.printf("Count : %d, U1=%d, U2=%d \n", countLoop, u1, u2);
-					countLoop++;
-					if ((u1 != u2) && !edgeSet.contains(edgePair)) 
+					if (((u1 != u2) && !edgeSet.contains(edgePair)) || (countLoop > 1000)) 
 						break;
 
 				}
 
-				//edgeSet.add(edgePair);
-				System.out.printf("Count0 = %d, Count1 = %d \n", conn0, conn1);
+				edgeSet.add(edgePair);
+				//System.out.printf("Count0 = %d, Count1 = %d \n", conn0, conn1);
 
 				count++;
 				if(count % 100 == 0){
 					System.out.println("iteration number "+count);
+					System.out.printf("Count0 = %d, Count1 = %d \n", conn0, conn1);
+				}
+				
+				if (countLoop > 1000) {
+					conn0 = conn0Cnt + 1;
+					conn1 = conn1Cnt + 1;
 				}
 
 				// Generate features for training data
 				if (count == 1)
-					out.write("edgePr \t infA \t infB \t infCmnNbhAB \t infCmnNbhOnA \t infCmnNbhOnB \t avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t infConcAonCmnNbh \t infConcBonCmnNbh \t infAonB \t infBonA \t trackSimALL \t trackSimA \t trackSimB \t connected \n");
+					out.write("edgePr \t infA \t infB \t " +
+							"infCmnNbhAB \t infCmnNbhOnA \t infCmnNbhOnB \t " +
+							"avg2hopAB \t avg2hopBA \t avg3hopAB \t avg3hopBA \t " +
+							"infConcAonCmnNbh \t infConcBonCmnNbh \t " +
+							"infAonB \t infBonA \t " +
+							"frndSimALL \t frndSimA \t frndSimB \t " +
+							"trackSimALL \t trackSimA \t trackSimB \t " +
+							"tagSimALL \t tagSimA \t tagSimB \t " +
+							"artistSimALL \t artistSimA \t artistSimB \t " +
+							"albumSimALL \t albumSimA \t albumSimB \t " +
+							"connected \n");
 
 				if ((hmFriends.get(user1) != null) || (hmFriends.get(user2) != null)) {
 					if (hmFriends.get(user1).contains(user2) || hmFriends.get(user2).contains(user1)){
@@ -506,9 +736,27 @@ public class LastFm {
 						calculateInfluenceOnCommonNeighbors(hmUser.get(user2), hmUser.get(user1)) + " \t " +
 						calculateInfluence(hmUser.get(user1), hmUser.get(user2)) + " \t " +
 						calculateInfluence(hmUser.get(user2), hmUser.get(user1)) + " \t " +
+						// Friend Similarity features						
+						calculateFriendSimilarity(hmUser.get(user2), hmUser.get(user1), "ALL") + " \t " +
+						calculateFriendSimilarity(hmUser.get(user2), hmUser.get(user1), "A") + " \t " +
+						calculateFriendSimilarity(hmUser.get(user2), hmUser.get(user1), "B") + " \t " +
+						// Track Similarity features						
 						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1), "ALL") + " \t " +
 						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1), "A") + " \t " +
 						calculateTrackSimilarity(hmUser.get(user2), hmUser.get(user1), "B") + " \t " +
+						// Tag Similarity features
+						calculateTagSimilarity(hmUser.get(user2), hmUser.get(user1), "ALL") + " \t " +
+						calculateTagSimilarity(hmUser.get(user2), hmUser.get(user1), "A") + " \t " +
+						calculateTagSimilarity(hmUser.get(user2), hmUser.get(user1), "B") + " \t " +
+						// Artist Similarity features
+						calculateArtistSimilarity(hmUser.get(user2), hmUser.get(user1), "ALL") + " \t " +
+						calculateArtistSimilarity(hmUser.get(user2), hmUser.get(user1), "A") + " \t " +
+						calculateArtistSimilarity(hmUser.get(user2), hmUser.get(user1), "B") + " \t " +
+						// Album Similarity features
+						calculateAlbumSimilarity(hmUser.get(user2), hmUser.get(user1), "ALL") + " \t " +
+						calculateAlbumSimilarity(hmUser.get(user2), hmUser.get(user1), "A") + " \t " +
+						calculateAlbumSimilarity(hmUser.get(user2), hmUser.get(user1), "B") + " \t " +						
+						// Response : connected(1) or not-connected(0) for a pair of users
 						connected +
 						" \n"
 				);
