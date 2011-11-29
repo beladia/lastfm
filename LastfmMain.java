@@ -85,7 +85,7 @@ public class LastfmMain {
 		while(it.hasNext()){
 			String user = it.next();
 			User userInfo = hmUser.get(user);
-			if(user != null){
+			if(userInfo != null){
 				HashSet<Track> tracks = userInfo.getHsTracks();
 				ArrayList<JSONObject> tracksJson = new ArrayList<JSONObject>();
 				if(tracks != null && tracks.size() > 0){
