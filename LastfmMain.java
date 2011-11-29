@@ -62,20 +62,20 @@ public class LastfmMain {
 					for (String f : friends){
 						User info = lastfmObj.getUserInfo(key, f);
 						hmUser.put(f, info);
-						
+
 						HashSet<String> fr = lastfmObj.getUserFriends(key, f);
 						hmFriends.put(f, fr);
-						
+
 					}
-				     
+
 				}
 				eventCount ++;
-				
+
 			}
 		}
 
 	}
-	
+
 	public static void dumpMaps(int count){
 		System.out.println("size of friends map "+hmFriends.size());
 		System.out.println("size of user map "+hmUser.size());
@@ -85,29 +85,31 @@ public class LastfmMain {
 		while(it.hasNext()){
 			String user = it.next();
 			User userInfo = hmUser.get(user);
-			HashSet<Track> tracks = userInfo.getHsTracks();
-			ArrayList<JSONObject> tracksJson = new ArrayList<JSONObject>();
-			if(tracks != null && tracks.size() > 0){
-				for(Track t : tracks){
-					TrackJson trk = new TrackJson();
-					trk.setAlbum(new JSONObject(t.getAlbum()));
-					trk.setArtist(new JSONObject(t.getArtist()));
-					trk.setName(t.getName());
-					trk.setID(t.getID());
-					trk.setDuration(t.getDuration());
-					trk.setListeners(t.getListeners());
-					trk.setPlayCount(t.getPlayCount());
-					trk.setTimeofPlay(t.getTimeofPlay());
-					trk.setTagName(t.getTagName());
-					JSONObject trackJson = new JSONObject(trk);
-					tracksJson.add(trackJson);
+			if(user != null){
+				HashSet<Track> tracks = userInfo.getHsTracks();
+				ArrayList<JSONObject> tracksJson = new ArrayList<JSONObject>();
+				if(tracks != null && tracks.size() > 0){
+					for(Track t : tracks){
+						TrackJson trk = new TrackJson();
+						trk.setAlbum(new JSONObject(t.getAlbum()));
+						trk.setArtist(new JSONObject(t.getArtist()));
+						trk.setName(t.getName());
+						trk.setID(t.getID());
+						trk.setDuration(t.getDuration());
+						trk.setListeners(t.getListeners());
+						trk.setPlayCount(t.getPlayCount());
+						trk.setTimeofPlay(t.getTimeofPlay());
+						trk.setTagName(t.getTagName());
+						JSONObject trackJson = new JSONObject(trk);
+						tracksJson.add(trackJson);
+					}
 				}
-			}
-			UserJson userJson = new UserJson();
-			userJson.setHsTracks(tracksJson);
+				UserJson userJson = new UserJson();
+				userJson.setHsTracks(tracksJson);
 
-			JSONObject userInfoJson = new JSONObject(userJson);
-			hmUserForJson.put(user, userInfoJson);
+				JSONObject userInfoJson = new JSONObject(userJson);
+				hmUserForJson.put(user, userInfoJson);
+			}
 		}
 
 		JSONObject friendsJsonObject = new JSONObject( hmFriends );
