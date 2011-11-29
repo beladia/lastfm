@@ -590,6 +590,7 @@ public class LastFm {
 		hmUser.putAll(readUser(prefixPath + "hmUser_spain_4"));
 		hmUser.putAll(readUser(prefixPath + "hmUser_spain_6"));
 		
+<<<<<<< HEAD
 		filePath = prefixPath + "hmfriends_spain_2";
 		hmFriends = readUserFriends(filePath);		
 		hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_3"));
@@ -608,6 +609,21 @@ public class LastFm {
 		
 		filePath = prefixPath + "traindata_tags_spain234.dat";
 		generateTrainData(filePath, 10000);
+=======
+		filePath = prefixPath + "hmfriends_spain_21";
+		hmFriends = readUserFriends(filePath);
+		hmFriends.putAll(readUserFriends(prefixPath + "hmfriends_spain_22"));
+		
+		/*String filePath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
+		hmUser = readUser(filePath);
+		
+		filePath = "/home/neera/lastfm-data/dumps/UK-data/hmfriends_uk_1300users";
+		hmFriends = readUserFriends(filePath);*/		
+		
+		filePath = prefixPath + "traindata.dat";
+		generateTrainData(filePath, 20000);
+		
+>>>>>>> 75b9d04f28a226b35e02c4332466861bb9433b2b
 	}
 
 

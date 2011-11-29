@@ -128,5 +128,31 @@ public class LastfmObjectUtil {
 		
 	}
 	
+	public static Date parseDate(String tp){
+		//2008-03-10 04:32
+		String dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
+		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+		try {
+			return sdf.parse(tp);
+		} catch (ParseException e) {
+			String dateFormat2 = "yyyy-mm-dd HH:mm";
+			SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);
+			try {
+				return sdf2.parse(tp);
+			} catch (ParseException e1) {
+				String dateFormat3 = "dd MMM yyyy, HH:mm";
+				SimpleDateFormat sdf3 = new SimpleDateFormat(dateFormat3);
+				try {
+					return sdf3.parse(tp);
+				} catch (ParseException e2) {				
+					e1.printStackTrace();
+				}
+			}
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 
 }
