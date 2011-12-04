@@ -7,7 +7,7 @@ public class UserJson {
 	private String ID, name, realName, country, gender;
 	private int age, playCount, playLists;
 	private Date registrationDate;
-	private ArrayList<JSONObject> hsTracks;
+	private HashMap<JSONObject, ArrayList<String>> hsTracks;
 	
 	
 	public String getUserID() {
@@ -64,23 +64,28 @@ public class UserJson {
 	public void setRegistrationDate(Date registrationDate) {
 		this.registrationDate = registrationDate;
 	}
-	public ArrayList<JSONObject> getHsTracks() {
+	public HashMap<JSONObject, ArrayList<String>> getHsTracks() {
 		return hsTracks;
 	}
-	public void setHsTracks(ArrayList<JSONObject> hsTracks) {
+	public void setHsTracks(HashMap<JSONObject, ArrayList<String>> hsTracks) {
 		this.hsTracks = hsTracks;
 	}
 	
-	public boolean addTrack(ArrayList<JSONObject> tracks){
-		return this.hsTracks.addAll(tracks);
-	}
-	public boolean removeTrack(Track track){
-		return this.hsTracks.remove(track);
-	}	
+	/*public void addTrack(JSONObject track){
+		if(this.hsTracks.containsKey(track)){
+			ArrayList<String> timeOfP = this.hsTracks.get(track);
+			timeOfP.add(track.getTimeofPlay());
+			this.hsTracks.put(track, timeOfP);
+		}else{
+			ArrayList<String> timeOfP = new ArrayList<String>();
+			timeOfP.add(track.getTimeofPlay());
+			this.hsTracks.put(track, timeOfP);
+		}
+	}*/
 	
 	public boolean equals(Object o) {
-		if (o instanceof User)
-			return this.ID.equals(((User) o).getUserID());
+		if (o instanceof UserOld)
+			return this.ID.equals(((UserOld) o).getUserID());
 		else return false;
 	}
 	

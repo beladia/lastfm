@@ -38,7 +38,7 @@ public class LastfmObjects {
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("artist");
 					if(nl != null && nl.getLength() > 0) {
@@ -71,7 +71,7 @@ public class LastfmObjects {
 				String resString = cr.getEntity(String.class);
 				//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"eventsAt"+location);
 				if(resString != null){
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("event");
 					if(nl != null && nl.getLength() > 0) {
@@ -109,7 +109,7 @@ public class LastfmObjects {
 				String resString = cr.getEntity(String.class);
 				//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"AttendeesForEventId"+eventId);
 				if(resString != null){
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("user");
 					if(nl != null && nl.getLength() > 0) {
@@ -142,7 +142,7 @@ public class LastfmObjects {
 			String subStr = "method=user.getfriends&user="+URLEncoder.encode(u, "UTF-8")+"&api_key="+key+"&limit=1000";
 			//String url = BASE_URL+URLEncoder.encode(subStr, "UTF-8");
 			String url = BASE_URL+subStr;
-			System.out.println(url);
+			//System.out.println(url);
 			HashSet<String> friends = new HashSet<String>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
@@ -151,7 +151,7 @@ public class LastfmObjects {
 				String resString = cr.getEntity(String.class);
 				//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"FriendListOf-"+u);
 				if(resString != null){
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("user");
 					if(nl != null && nl.getLength() > 0) {
@@ -175,7 +175,7 @@ public class LastfmObjects {
 			return null;
 		}	}
 
-	public Set<Track> getUserTracks(String key, String u) {
+	public HashMap<Track, ArrayList<String>> getUserTracks(String key, String u) {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rj&api_key=b25b959554ed76058
 			if(LastfmMain.hmUser.containsKey(u)){
@@ -183,15 +183,13 @@ public class LastfmObjects {
 			}
 			String url = BASE_URL+"method=user.getrecenttracks&user="+u+"&api_key="+key+"&limit=200";
 			//System.out.println(url);
-			HashMap<Track, String> tracks = new HashMap<Track, String>();
+			HashMap<Track, ArrayList<String>> tracks = new HashMap<Track, ArrayList<String>>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
-			//System.out.println(cr.toString());
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
-				//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"tracksOf-"+u);
 				if(resString != null){
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("track");
 					if(nl != null && nl.getLength() > 0) {
@@ -209,25 +207,20 @@ public class LastfmObjects {
 							track.setAlbum(getAlbumInfo(key, album));
 							//Steystem.out.println("track date "+LastfmObjectUtil.getDateValue(el, "date"));
 							if(tracks.containsKey(track)){
-								String existingTimeOfPlay = tracks.get(track);
+								ArrayList<String> timeOfPlayList = tracks.get(track);
 								String newTimeOfPlay = track.getTimeofPlay();
-								if(newTimeOfPlay != null && existingTimeOfPlay != null){
-									Date aDate = LastfmObjectUtil.parseDate(newTimeOfPlay);
-									Date bDate = LastfmObjectUtil.parseDate(existingTimeOfPlay);
-									if(aDate != null && bDate != null){
-										if(aDate.before(bDate)){
-											tracks.put(track, newTimeOfPlay);
-										}
-									}
-								}
+								timeOfPlayList.add(newTimeOfPlay);
+								tracks.put(track, timeOfPlayList);
 							}else{
-								tracks.put(track, track.getTimeofPlay());	
+								ArrayList<String> timeOfPlayList = new ArrayList();
+								timeOfPlayList.add(track.getTimeofPlay());
+								tracks.put(track, timeOfPlayList);	
 							}
 						}
 					}
 
 				}
-				return tracks.keySet();
+				return tracks;
 			}
 			else{
 				System.err.println("error in fetching user tracks...ignoring");
@@ -253,7 +246,7 @@ public class LastfmObjects {
 			String resString = cr.getEntity(String.class);
 			//String fileName = LastfmObjectUtil.writeXMLToFile(resString, LastfmMain.outpath+"tracksOf-tag-"+trackName);
 			if(resString != null){
-				ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+				ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 				Element docEle = LastfmObjectUtil.parseXml(bs);
 				NodeList nl = docEle.getElementsByTagName("track");
 				if(nl != null && nl.getLength() > 0) {
@@ -293,14 +286,14 @@ public class LastfmObjects {
 	public User getUserInfo(String key, String u) {
 		try{
 			String url = BASE_URL+"method=user.getinfo&user="+u+"&api_key="+key;
-			Collection<Track> tracks = getUserTracks(key, u); 
+			HashMap<Track, ArrayList<String>> tracks = getUserTracks(key, u); 
 			User userInfo = new User();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("user");
 					if(nl != null && nl.getLength() > 0) {
@@ -316,7 +309,7 @@ public class LastfmObjects {
 							userInfo.setPlayLists(LastfmObjectUtil.getIntValue(el, "playlists"));
 							userInfo.setRegistrationDate(LastfmObjectUtil.getDateValue(el, "registered"));
 							if(tracks != null)
-								userInfo.setHsTracks(new HashSet(tracks));
+								userInfo.setHsTracks(tracks);
 						}
 					}
 				}

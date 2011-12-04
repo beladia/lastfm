@@ -1,9 +1,5 @@
 package lastfm;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Track {
 	private String ID, name;
 	private long duration;
@@ -11,42 +7,20 @@ public class Track {
 	private Artist artist;
 	private Album album;
 	private String timeofPlay;
+	private String tagName;
 
+	public String getTagName() {
+		return tagName;
+	}
+	public void setTagName(String tagName2) {
+		this.tagName = tagName2;
+	}
 	public String getTimeofPlay() {
 		return timeofPlay;
 	}
 	public void setTimeofPlay(String timeofPlay) {
 		this.timeofPlay = timeofPlay;
 	}
-
-	/*
-	public void setTimeofPlay(String tp){
-		//2008-03-10 04:32
-		String dateFormat = "EEE MMM dd HH:mm:ss zzz yyyy";
-		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-		try {
-			this.timeofPlay = sdf.parse(tp);
-		} catch (ParseException e) {
-			String dateFormat2 = "yyyy-mm-dd HH:mm";
-			SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);
-			try {
-				this.timeofPlay = sdf2.parse(tp);
-			} catch (ParseException e1) {
-				String dateFormat3 = "dd MMM yyyy, HH:mm";
-				SimpleDateFormat sdf3 = new SimpleDateFormat(dateFormat3);
-				try {
-					this.timeofPlay = sdf3.parse(tp);
-				} catch (ParseException e2) {				
-					e1.printStackTrace();
-				}
-			}
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-	}
-	
-	*/
-
 	public String getID() {
 		return ID;
 	}

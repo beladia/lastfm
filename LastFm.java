@@ -70,25 +70,19 @@ public class LastFm {
 			return 0.0;
 
 		// Get Common Tracks played by User A and User B
-		HashMap<Track, String> aTracks = new HashMap<Track, String>();
-		HashMap<Track, String> bTracks = new HashMap<Track, String>();
+		HashMap<Track, ArrayList<String>> aTracks = A.getHsTracks();
+		HashMap<Track, ArrayList<String>> bTracks = B.getHsTracks();
 
-		for (Track at : A.getHsTracks()){
-			aTracks.put(at, at.getTimeofPlay());
-		}
-		for (Track bt : B.getHsTracks()){
-			bTracks.put(bt, bt.getTimeofPlay());
-		}
 		Iterator<Track> it =  aTracks.keySet().iterator();
 		while(it.hasNext()){
 			Track track = it.next();
-			String aTimeOfPlay = aTracks.get(track);
-			if(aTimeOfPlay != null && !aTimeOfPlay.equals("")){
+			ArrayList<String> aTimeOfPlay = aTracks.get(track);
+			if(aTimeOfPlay != null){
 				if(bTracks.containsKey(track)){
-					String bTimeOfPlay = bTracks.get(track);
-					if(bTimeOfPlay != null && !bTimeOfPlay.equals("")){
-						Date aDate = parseDate(aTimeOfPlay);
-						Date bDate = parseDate(bTimeOfPlay);
+					ArrayList<String> bTimeOfPlay = bTracks.get(track);
+					if(bTimeOfPlay != null){
+						Date aDate = parseDate(aTimeOfPlay.get(0));
+						Date bDate = parseDate(bTimeOfPlay.get(0));
 						if(aDate.before(bDate)){
 							days = (bDate.getTime() - aDate.getTime())/(1000*60*60*24);
 							if (days == 0)
@@ -309,13 +303,13 @@ public class LastFm {
 		
 		// Intersection set for numerator for Jaccard sim calculation		
 		HashSet<Track> intersect = new HashSet<Track>();
-		intersect.addAll(A.getHsTracks());
-		intersect.retainAll(B.getHsTracks());
+		intersect.addAll(A.getHsTracks().keySet());
+		intersect.retainAll(B.getHsTracks().keySet());
 		
 		if (wrto.toUpperCase().equals("ALL")){
 			HashSet<Track> union = new HashSet<Track>();
-			union.addAll(A.getHsTracks());
-			union.addAll(B.getHsTracks());
+			union.addAll(A.getHsTracks().keySet());
+			union.addAll(B.getHsTracks().keySet());
 
 			sim = (double)intersect.size()/union.size();
 		}
@@ -345,15 +339,15 @@ public class LastFm {
 		HashSet<String> BTags = new HashSet<String>();
 		
 		// Add all unique tags related to tracks listened to by User A to ATags
-		for (Track t : A.getHsTracks()) {
-			if (t.getTags() != null) 
-				ATags.addAll(t.getTags());			
+		for (Track t : A.getHsTracks().keySet()) {
+			if (t.getTagName() != null) 
+				ATags.add(t.getTagName());			
 		}
 		
 		// Add all unique tags related to tracks listened to by User B to BTags
-		for (Track t : B.getHsTracks()) {
-			if (t.getTags() != null) 
-				BTags.addAll(t.getTags());			
+		for (Track t : B.getHsTracks().keySet()) {
+			if (t.getTagName() != null) 
+				BTags.add(t.getTagName());			
 		}
 		
 		if ((ATags.size() == 0) || (BTags.size() == 0))
@@ -398,13 +392,13 @@ public class LastFm {
 		HashSet<String> Bartists = new HashSet<String>();
 		
 		// Add all unique artists related to tracks listened to by User A to Aartists
-		for (Track t : A.getHsTracks()) {
+		for (Track t : A.getHsTracks().keySet()) {
 			if (t.getArtist() != null)
 				Aartists.add(t.getArtist().getName().toLowerCase());
 		}
 		
 		// Add all unique artists related to tracks listened to by User B to Aartists
-		for (Track t : B.getHsTracks()) {
+		for (Track t : B.getHsTracks().keySet()) {
 			if (t.getArtist() != null)
 				Bartists.add(t.getArtist().getName().toLowerCase());
 		}
@@ -452,7 +446,7 @@ public class LastFm {
 		HashSet<String> Balbums = new HashSet<String>();
 		
 		// Add all unique albums related to tracks listened to by User A to Aalbums
-		for (Track t : A.getHsTracks()) {
+		for (Track t : A.getHsTracks().keySet()) {
 			if (t.getAlbum() != null) {
 				if (t.getAlbum().getName() != null)
 					Aalbums.add(t.getAlbum().getName().toLowerCase());
@@ -460,7 +454,7 @@ public class LastFm {
 		}
 		
 		// Add all unique albums related to tracks listened to by User B to Aartists
-		for (Track t : B.getHsTracks()) {
+		for (Track t : B.getHsTracks().keySet()) {
 			if (t.getAlbum() != null) {
 				if (t.getAlbum().getName() != null)
 					Balbums.add(t.getAlbum().getName().toLowerCase());
@@ -535,7 +529,7 @@ public class LastFm {
 		return sim;
 	}		
 
-	private static String readFileAsString(String filePath) throws java.io.IOException{
+	public static String readFileAsString(String filePath) throws java.io.IOException{
 		byte[] buffer = new byte[(int) new File(filePath).length()];
 		BufferedInputStream f = null;
 		try {

@@ -5,7 +5,7 @@ public class User {
 	private String ID, name, realName, country, gender;
 	private int age, playCount, playLists;
 	private Date registrationDate;
-	private HashSet<Track> hsTracks;
+	private HashMap<Track, ArrayList<String>> hsTracks;
 	
 	
 	public String getUserID() {
@@ -62,20 +62,29 @@ public class User {
 	public void setRegistrationDate(Date registrationDate) {
 		this.registrationDate = registrationDate;
 	}
-	public HashSet<Track> getHsTracks() {
+	public HashMap<Track, ArrayList<String>> getHsTracks() {
 		return hsTracks;
 	}
-	public void setHsTracks(HashSet<Track> hsTracks) {
+	public void setHsTracks(HashMap<Track, ArrayList<String>> hsTracks) {
 		this.hsTracks = hsTracks;
 	}
 	
-	public boolean addTrack(Track track){
-		return this.hsTracks.add(track);
+	public void addTrack(Track track){
+		if(this.hsTracks.containsKey(track)){
+			ArrayList<String> timeOfP = this.hsTracks.get(track);
+			timeOfP.add(track.getTimeofPlay());
+			this.hsTracks.put(track, timeOfP);
+		}else{
+			ArrayList<String> timeOfP = new ArrayList<String>();
+			timeOfP.add(track.getTimeofPlay());
+			this.hsTracks.put(track, timeOfP);
+		}
 	}
-	public boolean removeTrack(Track track){
+	
+	/*public boolean removeTrack(Track track){
 		return this.hsTracks.remove(track);
 	}	
-	
+	*/
 	public boolean equals(Object o) {
 		if (o instanceof User)
 			return this.ID.equals(((User) o).getUserID());
