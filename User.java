@@ -4,8 +4,8 @@ import java.util.*;
 public class User {
 	private String ID, name, realName, country, gender;
 	private int age, playCount, playLists;
-	private Date registrationDate;
-	private HashMap<Track, ArrayList<String>> hsTracks;
+	private String registrationDate;
+	private HashMap<Object, ArrayList<String>> hsTracks;
 	
 	
 	public String getUserID() {
@@ -56,16 +56,16 @@ public class User {
 	public void setPlayLists(int playLists) {
 		this.playLists = playLists;
 	}
-	public Date getRegistrationDate() {
+	public String getRegistrationDate() {
 		return registrationDate;
 	}
-	public void setRegistrationDate(Date registrationDate) {
+	public void setRegistrationDate(String registrationDate) {
 		this.registrationDate = registrationDate;
 	}
-	public HashMap<Track, ArrayList<String>> getHsTracks() {
+	public HashMap<Object, ArrayList<String>> getHsTracks() {
 		return hsTracks;
 	}
-	public void setHsTracks(HashMap<Track, ArrayList<String>> hsTracks) {
+	public void setHsTracks(HashMap<Object, ArrayList<String>> hsTracks) {
 		this.hsTracks = hsTracks;
 	}
 	
