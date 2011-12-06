@@ -74,17 +74,17 @@ public class LastFm {
 			return 0.0;
 
 		// Get Common Tracks played by User A and User B
-		HashMap<Track, ArrayList<String>> aTracks = A.getHsTracks();
-		HashMap<Track, ArrayList<String>> bTracks = B.getHsTracks();
+		HashMap<Object, ArrayList<String>> aTracks = A.getHsTracks();
+		HashMap<Object, ArrayList<String>> bTracks = B.getHsTracks();
 
-		HashSet<Track> intersect = new HashSet<Track>();
+		HashSet<Object> intersect = new HashSet<Object>();
 		intersect.addAll(aTracks.keySet());
 		intersect.retainAll(bTracks.keySet());
 
 		ArrayList<String> aTimeList, bTimeList;
 		double minDays = -99;
 		// For each of the common tracks calculate a cumulative influence
-		for (Track t : intersect) {
+		for (Object t : intersect) {
 			aTimeList = aTracks.get(t);
 			bTimeList = bTracks.get(t);
 
@@ -352,12 +352,12 @@ public class LastFm {
 			return 0.0;
 
 		// Intersection set for numerator for Jaccard sim calculation		
-		HashSet<Track> intersect = new HashSet<Track>();
+		HashSet<Object> intersect = new HashSet<Object>();
 		intersect.addAll(A.getHsTracks().keySet());
 		intersect.retainAll(B.getHsTracks().keySet());
 
 		if (wrto.toUpperCase().equals("ALL")){
-			HashSet<Track> union = new HashSet<Track>();
+			HashSet<Object> union = new HashSet<Object>();
 			union.addAll(A.getHsTracks().keySet());
 			union.addAll(B.getHsTracks().keySet());
 
@@ -389,18 +389,18 @@ public class LastFm {
 		HashSet<String> BTags = new HashSet<String>();
 
 		// Add all unique tags related to tracks listened to by User A to ATags
-		for (Track t : A.getHsTracks().keySet()) {
-			if (t.getTagName() != null) {
-				StringTokenizer str = new StringTokenizer(t.getTagName(), ";");
+		for (Object t : A.getHsTracks().keySet()) {
+			if (((Track) t).getTagName() != null) {
+				StringTokenizer str = new StringTokenizer(((Track) t).getTagName(), ";");
 				while(str.hasMoreElements())
 					ATags.add(str.nextToken());
 			} 		
 		}
 
 		// Add all unique tags related to tracks listened to by User B to BTags
-		for (Track t : B.getHsTracks().keySet()) {
-			if (t.getTagName() != null) {
-				StringTokenizer str = new StringTokenizer(t.getTagName(), ";");
+		for (Object t : B.getHsTracks().keySet()) {
+			if (((Track) t).getTagName() != null) {
+				StringTokenizer str = new StringTokenizer(((Track) t).getTagName(), ";");
 				while(str.hasMoreElements())
 					BTags.add(str.nextToken());
 			} 		
@@ -448,15 +448,15 @@ public class LastFm {
 		HashSet<String> Bartists = new HashSet<String>();
 
 		// Add all unique artists related to tracks listened to by User A to Aartists
-		for (Track t : A.getHsTracks().keySet()) {
-			if (t.getArtist() != null)
-				Aartists.add(t.getArtist().getName().toLowerCase());
+		for (Object t : A.getHsTracks().keySet()) {
+			if (((Track) t).getArtist() != null)
+				Aartists.add(((Track) t).getArtist().toLowerCase());
 		}
 
 		// Add all unique artists related to tracks listened to by User B to Aartists
-		for (Track t : B.getHsTracks().keySet()) {
-			if (t.getArtist() != null)
-				Bartists.add(t.getArtist().getName().toLowerCase());
+		for (Object t : B.getHsTracks().keySet()) {
+			if (((Track) t).getArtist() != null)
+				Bartists.add(((Track) t).getArtist().toLowerCase());
 		}
 
 		if ((Aartists.size() == 0) || (Bartists.size() == 0))
@@ -502,18 +502,18 @@ public class LastFm {
 		HashSet<String> Balbums = new HashSet<String>();
 
 		// Add all unique albums related to tracks listened to by User A to Aalbums
-		for (Track t : A.getHsTracks().keySet()) {
-			if (t.getAlbum() != null) {
-				if (t.getAlbum().getName() != null)
-					Aalbums.add(t.getAlbum().getName().toLowerCase());
+		for (Object t : A.getHsTracks().keySet()) {
+			if (((Track) t).getAlbum() != null) {
+				if (((Track) t).getAlbum() != null)
+					Aalbums.add(((Track) t).getAlbum().toLowerCase());
 			}
 		}
 
 		// Add all unique albums related to tracks listened to by User B to Aartists
-		for (Track t : B.getHsTracks().keySet()) {
-			if (t.getAlbum() != null) {
-				if (t.getAlbum().getName() != null)
-					Balbums.add(t.getAlbum().getName().toLowerCase());
+		for (Object t : B.getHsTracks().keySet()) {
+			if (((Track) t).getAlbum() != null) {
+				if (((Track) t).getAlbum() != null)
+					Balbums.add(((Track) t).getAlbum().toLowerCase());
 			}
 		}
 

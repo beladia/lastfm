@@ -87,13 +87,14 @@ public class LastfmMain {
 			String user = it.next();
 			User userInfo = hmUser.get(user);
 			if(userInfo != null){
-				HashMap<Track, ArrayList<String>> tracks = userInfo.getHsTracks();
-				HashMap<JSONObject, ArrayList<String>> tracksJson = new HashMap<JSONObject, ArrayList<String>> ();
+				HashMap<Object, ArrayList<String>> tracks = userInfo.getHsTracks();
+				HashMap<TrackJson, ArrayList<String>> tracksJson = new HashMap<TrackJson, ArrayList<String>> ();
 				ArrayList<String> timeOfPlay = new ArrayList<String>();
 				if(tracks != null && tracks.size() > 0){
-					for(Track t : tracks.keySet()){
+					for(Object tObj :  tracks.keySet()){
+						Track t = (Track) tObj;
 						TrackJson trk = new TrackJson();
-						trk.setAlbum(new JSONObject(t.getAlbum()));
+						trk.setAlbum((t.getAlbum()));
 						trk.setArtist(new JSONObject(t.getArtist()));
 						trk.setName(t.getName());
 						trk.setID(t.getID());
@@ -104,7 +105,7 @@ public class LastfmMain {
 						trk.setTagName(t.getTagName());
 						timeOfPlay.add(trk.getTimeofPlay());
 						JSONObject trkJsonObj = new JSONObject(trk);
-						tracksJson.put(trkJsonObj, timeOfPlay);
+						tracksJson.put(trk, timeOfPlay);
 					}
 				}
 				UserJson userJson = new UserJson ();

@@ -30,8 +30,10 @@ public class GetUserIdsFromUserMap {
 
 	public static void main(String[] args){
 		try{
-			String userMapPath = "/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
-			String userIdFilePath = "/home/neera/lastfm-data/dumps/UK-data/userIds_uk_1300users";	
+			String userMapPath = args[0];//"/home/neera/lastfm-data/dumps/UK-data/hmUser_uk_1300users";
+			String userIdFilePath = args[1]; //"/home/neera/lastfm-data/dumps/UK-data/userIds_uk_1300users";
+			System.out.println("user map location : "+userMapPath);
+			System.out.println("user id file output location : "+userIdFilePath);
 			HashMap<String, UserOld> hmUser = readUser(userMapPath);
 			System.out.println("user map size "+hmUser.size());
 			Iterator<String> it = hmUser.keySet().iterator();

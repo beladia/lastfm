@@ -4,8 +4,8 @@ public class Track {
 	private String ID, name;
 	private long duration;
 	private int listeners, playCount;
-	private Artist artist;
-	private Album album;
+	private String artist;
+	private String album;
 	private String timeofPlay;
 	private String tagName;
 
@@ -51,22 +51,22 @@ public class Track {
 	public void setPlayCount(int playCount) {
 		this.playCount = playCount;
 	}
-	public Artist getArtist() {
+	public String getArtist() {
 		return artist;
 	}
-	public void setArtist(Artist artist) {
+	public void setArtist(String artist) {
 		this.artist = artist;
 	}
-	public Album getAlbum() {
+	public String getAlbum() {
 		return album;
 	}
-	public void setAlbum(Album album) {
+	public void setAlbum(String album) {
 		this.album = album;
 	}
 
 	public boolean equals(Object o) {
 		if (o instanceof Track)
-			return (this.name.toLowerCase().equals(((Track) o).getName().toLowerCase()) && this.artist.getName().toLowerCase().equals(((Track) o).getArtist().getName().toLowerCase()));
+			return (this.name.toLowerCase().equals(((Track) o).getName().toLowerCase()) && this.artist.toLowerCase().equals(((Track) o).getArtist().toLowerCase()));
 		else return false;
 	}
 

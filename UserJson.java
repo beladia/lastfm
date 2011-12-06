@@ -7,7 +7,7 @@ public class UserJson {
 	private String ID, name, realName, country, gender;
 	private int age, playCount, playLists;
 	private Date registrationDate;
-	private HashMap<JSONObject, ArrayList<String>> hsTracks;
+	private HashMap<TrackJson, ArrayList<String>> hsTracks;
 	
 	
 	public String getUserID() {
@@ -64,10 +64,10 @@ public class UserJson {
 	public void setRegistrationDate(Date registrationDate) {
 		this.registrationDate = registrationDate;
 	}
-	public HashMap<JSONObject, ArrayList<String>> getHsTracks() {
+	public HashMap<TrackJson, ArrayList<String>> getHsTracks() {
 		return hsTracks;
 	}
-	public void setHsTracks(HashMap<JSONObject, ArrayList<String>> hsTracks) {
+	public void setHsTracks(HashMap<TrackJson, ArrayList<String>> hsTracks) {
 		this.hsTracks = hsTracks;
 	}
 	
