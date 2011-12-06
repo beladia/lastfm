@@ -9,61 +9,61 @@ public class User {
 	
 	
 	public String getUserID() {
-		return ID;
+		return this.ID;
 	}
 	public void setUserID(String ID) {
 		this.ID = ID;
 	}
 	public String getName() {
-		return name;
+		return this.name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
 	public String getRealName() {
-		return realName;
+		return this.realName;
 	}
 	public void setRealname(String realName) {
 		this.realName = realName;
 	}
 	public String getCountry() {
-		return country;
+		return this.country;
 	}
 	public void setCountry(String country) {
 		this.country = country;
 	}
 	public String getGender() {
-		return gender;
+		return this.gender;
 	}
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
 	public int getAge() {
-		return age;
+		return this.age;
 	}
 	public void setAge(int age) {
 		this.age = age;
 	}
 	public int getPlayCount() {
-		return playCount;
+		return this.playCount;
 	}
 	public void setPlayCount(int playCount) {
 		this.playCount = playCount;
 	}
 	public int getPlayLists() {
-		return playLists;
+		return this.playLists;
 	}
 	public void setPlayLists(int playLists) {
 		this.playLists = playLists;
 	}
 	public Date getRegistrationDate() {
-		return registrationDate;
+		return this.registrationDate;
 	}
 	public void setRegistrationDate(Date registrationDate) {
 		this.registrationDate = registrationDate;
 	}
 	public HashMap<Track, ArrayList<String>> getHsTracks() {
-		return hsTracks;
+		return this.hsTracks;
 	}
 	public void setHsTracks(HashMap<Track, ArrayList<String>> hsTracks) {
 		this.hsTracks = hsTracks;
