@@ -175,7 +175,7 @@ public class LastfmObjects {
 			return null;
 		}	}
 
-	public HashMap<Track, ArrayList<String>> getUserTracks(String key, String u) {
+	public HashMap<Object, ArrayList<String>> getUserTracks(String key, String u) {
 		try{
 			// http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rj&api_key=b25b959554ed76058
 			if(LastfmMain.hmUser.containsKey(u)){
@@ -183,7 +183,7 @@ public class LastfmObjects {
 			}
 			String url = BASE_URL+"method=user.getrecenttracks&user="+u+"&api_key="+key+"&limit=200";
 			//System.out.println(url);
-			HashMap<Track, ArrayList<String>> tracks = new HashMap<Track, ArrayList<String>>();
+			HashMap<Object, ArrayList<String>> tracks = new HashMap<Object, ArrayList<String>>();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
@@ -203,8 +203,8 @@ public class LastfmObjects {
 							String tagName = getTrackTagName(trackName, artist, key);
 							track.setTagName(tagName);
 							String album = LastfmObjectUtil.getTextValue(el, "album");
-							track.setArtist(getArtistInfo(key, artist));
-							track.setAlbum(getAlbumInfo(key, album));
+							track.setArtist(artist);
+							track.setAlbum(album);
 							//Steystem.out.println("track date "+LastfmObjectUtil.getDateValue(el, "date"));
 							if(tracks.containsKey(track)){
 								ArrayList<String> timeOfPlayList = tracks.get(track);
@@ -286,7 +286,7 @@ public class LastfmObjects {
 	public User getUserInfo(String key, String u) {
 		try{
 			String url = BASE_URL+"method=user.getinfo&user="+u+"&api_key="+key;
-			HashMap<Track, ArrayList<String>> tracks = getUserTracks(key, u); 
+			HashMap<Object, ArrayList<String>> tracks = getUserTracks(key, u); 
 			User userInfo = new User();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
@@ -307,7 +307,7 @@ public class LastfmObjects {
 							userInfo.setAge(LastfmObjectUtil.getIntValue(el, "age"));
 							userInfo.setPlayCount(LastfmObjectUtil.getIntValue(el, "playcount"));
 							userInfo.setPlayLists(LastfmObjectUtil.getIntValue(el, "playlists"));
-							userInfo.setRegistrationDate(LastfmObjectUtil.getDateValue(el, "registered"));
+							userInfo.setRegistrationDate(LastfmObjectUtil.getTextValue(el, "registered"));
 							if(tracks != null)
 								userInfo.setHsTracks(tracks);
 						}

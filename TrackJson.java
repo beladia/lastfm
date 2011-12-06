@@ -8,7 +8,7 @@ public class TrackJson {
 	private String ID, name;
 	private long duration;
 	private int listeners, playCount;
-	private JSONObject artist;
+	private String artist;
 	private String album;
 	private String timeofPlay;
 	private String tagName;
@@ -56,11 +56,11 @@ public class TrackJson {
 	public void setPlayCount(int playCount) {
 		this.playCount = playCount;
 	}
-	public JSONObject getArtist() {
+	public String getArtist() {
 		return artist;
 	}
-	public void setArtist(JSONObject artist) {
-		this.artist = artist;
+	public void setArtist(String string) {
+		this.artist = string;
 	}
 	public String getAlbum() {
 		return album;

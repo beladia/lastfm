@@ -95,7 +95,7 @@ public class LastfmMain {
 						Track t = (Track) tObj;
 						TrackJson trk = new TrackJson();
 						trk.setAlbum((t.getAlbum()));
-						trk.setArtist(new JSONObject(t.getArtist()));
+						trk.setArtist(t.getArtist());
 						trk.setName(t.getName());
 						trk.setID(t.getID());
 						trk.setDuration(t.getDuration());
