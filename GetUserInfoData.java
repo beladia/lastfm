@@ -105,7 +105,7 @@ public class GetUserInfoData {
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
-					System.out.println(resString);
+					//System.out.println(resString);
 					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("track");
@@ -299,9 +299,9 @@ public class GetUserInfoData {
 				System.out.println("count = "+i);
 				User user = userInfo.getUserInfo(key, userIdArray[i]);
 				hmUser.put(userIdArray[i], user);
-				//if(i %20 == 0){
-				dumpUserData(country, outPath, i);
-				//}
+				if(i %20 == 0){
+					dumpUserData(country, outPath, i);
+				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();

@@ -11,13 +11,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -702,8 +706,99 @@ public class LastFm {
 
 		 **/		
 	}
+	
 
+	static HashMap<String, Boolean> topGenreList = new HashMap<String, Boolean>();
+	public static void getTopTrackGenre(int count){
+		HashMap<String, Integer> topGenre = new HashMap<String, Integer>();
+		lastfm.LastFm.ValueComparator bvc =  new LastFm().new ValueComparator(topGenre);
+		TreeMap<String, Integer> sortedTopGenre = new TreeMap(bvc);
+		Iterator<User> it = hmUser.values().iterator();
+		while(it.hasNext()){
+			User user = it.next();
+			Set<Object> userTracks = user.getHsTracks().keySet();
+			Iterator<Object> trackIt = userTracks.iterator();
+			while(trackIt.hasNext()){
+				Track tr = (Track) trackIt.next();
+				if(tr != null){
+					String tagString = tr.getTagName();
+					//System.out.println("tag is "+tagString);
+					String[] tags = tagString.split(";");
+					for(String t : tags){
+						//System.out.println("tag after split is "+t);
+						if(topGenre.containsKey(t)){
+							topGenre.put(t, topGenre.get(t)+1);
+						}else{
+							topGenre.put(t, 1);
+						}
+					}
+				}
+			}
+		}
+		System.out.println("tag list size is "+topGenre.size());
+		sortedTopGenre.putAll(topGenre);
+		String[] genre = sortedTopGenre.keySet().toArray(new String[0]);
+		for(int i =0 ; i < count; i++){
+			topGenreList.put(genre[i], true);
+		}
+	
+	}
 
+	public static HashMap<String, Integer> getUserGenreScore(Set<Object> aTracks){
+	HashMap<String, Integer> GenreScore = new HashMap<String, Integer>();
+	for(Object at : aTracks){
+		String[] tags = ((Track) at).getTagName().split(";");
+		for(String t : tags){
+			if(GenreScore.containsKey(t)){
+				GenreScore.put(t, GenreScore.get(t)+1);
+			}
+			else{
+				if(topGenreList.containsKey(t)){
+					GenreScore.put(t, 1);
+				}
+			}
+		}
+	}
+	return GenreScore;
+	}
+	
+	public static double getGenreSimilarity(User A, User B){
+		Set<Object> ATracks = A.getHsTracks().keySet();
+		Set<Object> BTracks = B.getHsTracks().keySet();
+		HashMap<String, Integer> AScore = getUserGenreScore(ATracks);
+		HashMap<String, Integer> BScore = getUserGenreScore(BTracks);
+		Iterator<String> it = AScore.keySet().iterator();
+		int distance = 0;
+		while(it.hasNext()){
+			String key = it.next();
+			if(BScore.containsKey(key)){
+				Integer aVal = AScore.get(key);
+				Integer bVal = BScore.get(key);
+				int diff = aVal - bVal;
+				distance = distance + diff*diff;
+			}
+		}
+		
+		return (Math.sqrt(distance));
+	}
+
+	public class ValueComparator implements Comparator {
+		Map base;
+		public ValueComparator(Map base) {
+			this.base = base;
+		}
+
+		public int compare(Object a, Object b) {
+			if((Integer)base.get(a) < (Integer)base.get(b)) {
+				return 1;
+			} else if((Integer)base.get(a) == (Integer)base.get(b)) {
+				return 0;
+			} else {
+				return -1;
+			}
+		}
+	}
+	
 	public static void generateTrainData(String outpath, int trainSz) throws IOException{
 		// Get List of all Users
 		List<String> users = new ArrayList<String>(hmUser.keySet());
