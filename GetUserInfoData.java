@@ -207,22 +207,27 @@ public class GetUserInfoData {
 		while(it.hasNext()){
 			String user = it.next();
 			User userInfo = hmUser.get(user);
-			HashMap<Object, ArrayList<String>> tracks = userInfo.getHsTracks();
-			HashMap<Object, ArrayList<String>> tracksJson = new HashMap<Object, ArrayList<String>>();
-			if(tracks != null){
-				Iterator<Object> trkIt = tracks.keySet().iterator();
-				while(trkIt.hasNext()){
-					Object tk =  trkIt.next();
-					Object trkJson = new JSONObject(tk);
-					tracksJson.put(trkJson, tracks.get(tk));
+			if(userInfo != null){
+				HashMap<Object, ArrayList<String>> tracks = userInfo.getHsTracks();
+				HashMap<Object, ArrayList<String>> tracksJson = new HashMap<Object, ArrayList<String>>();
+				if(tracks != null){
+					Iterator<Object> trkIt = tracks.keySet().iterator();
+					while(trkIt.hasNext()){
+						Object tk =  trkIt.next();
+						if(tk != null){
+							Object trkJson = new JSONObject(tk);
+							tracksJson.put(trkJson, tracks.get(tk));
+						}
+					}
 				}
+				userInfo.setHsTracks(tracksJson);
+				hmUser.put(user, userInfo);
 			}
-			userInfo.setHsTracks(tracksJson);
-			hmUser.put(user, userInfo);
 		}
 		Map<String, Object> userInMap = new HashMap<String, Object>();
 		try {
 			// write JSON to a file
+			System.out.println("file = "+outPath+"hmUser_"+country+"_"+count);
 			mapper.writeValue(new File(outPath+"hmUser_"+country+"_"+count), hmUser);
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
@@ -295,7 +300,8 @@ public class GetUserInfoData {
 			userInfo.loadUsersIdsFromFile(USER_ID_FILE);
 			String[] userIdArray = userIds.toArray(new String[0]);
 			int count =userIdArray.length;
-			for(int i = count-1; i >= 0; i--){
+			//for(int i = count-1; i >= 0; i--){
+			for(int i = 0; i < count-1; i++){
 				System.out.println("count = "+i);
 				User user = userInfo.getUserInfo(key, userIdArray[i]);
 				hmUser.put(userIdArray[i], user);
