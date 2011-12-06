@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ public class LastFm {
 
 	static HashMap<String, HashSet<String>>  hmFriends;
 	static HashMap<String, User> hmUser;	
+	static HashMap<String, Integer> hmUserID = new HashMap<String, Integer>();
 
 	public static Date parseDate(String tp){
 		if (tp == null)
@@ -575,6 +577,42 @@ public class LastFm {
 
 		return hmU;
 	}	
+	
+	
+	public static int getUserID(String userid) {
+		if (hmUserID.size() > 0) {
+			if (hmUserID.get(userid) != null)
+				return hmUserID.get(userid);
+			else {
+				hmUserID.put(userid, Collections.max(hmUserID.values()) + 1);
+				return Collections.max(hmUserID.values()) + 1;
+			}
+		}
+		else {
+			hmUserID.put(userid, 0);
+			return 0;
+		}
+	}
+	
+	public static void generateEdgeListFile(String filePath) throws IOException {
+		FileWriter fstream = null;
+		BufferedWriter out = null;
+
+		try{
+			fstream = new FileWriter(filePath);
+			out = new BufferedWriter(fstream);
+			for (String user : hmFriends.keySet()) {
+				for (String friend : hmFriends.get(user))
+					out.write(getUserID(user) + "\t" + getUserID(friend) + "\n");
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			out.close();
+		}
+	}
 
 	public static void main(String[] args) throws IOException{				
 		String prefixPath = "C:\\Users\\beladia\\workspace\\lastfm\\datazips\\spain-data-with-tags\\spain-data-with-tags\\";
@@ -599,6 +637,9 @@ public class LastFm {
 		//System.out.println("Average No. of Friends in the Network = " + LastfmStats.getAverageNumFriends());
 		//LastfmStats.getDegreeDistribution(prefixPath + "FriendDistribution_uk1300.dat");
 		//LastfmStats.getActivityDistribution(prefixPath + "TrackDistribution_uk1300.dat", prefixPath + "ActivityDistribution_uk1300.dat");
+		
+		filePath = prefixPath + "EdgeList_US.dat";
+		generateEdgeListFile(filePath);
 		
 		filePath = prefixPath + "traindata_tags_spain234.dat";
 		generateTrainData(filePath, 10000);
