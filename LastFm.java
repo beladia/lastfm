@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.StringTokenizer;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -342,14 +343,20 @@ public class LastFm {
 		
 		// Add all unique tags related to tracks listened to by User A to ATags
 		for (Track t : A.getHsTracks().keySet()) {
-			if (t.getTagName() != null) 
-				ATags.add(t.getTagName());			
+			if (t.getTagName() != null) {
+				StringTokenizer str = new StringTokenizer(t.getTagName(), ";");
+				while(str.hasMoreElements)
+					ATags.add(str.nextToken());
+			} 		
 		}
 		
 		// Add all unique tags related to tracks listened to by User B to BTags
 		for (Track t : B.getHsTracks().keySet()) {
-			if (t.getTagName() != null) 
-				BTags.add(t.getTagName());			
+			if (t.getTagName() != null) {
+				StringTokenizer str = new StringTokenizer(t.getTagName(), ";");
+				while(str.hasMoreElements)
+					BTags.add(str.nextToken());
+			} 		
 		}
 		
 		if ((ATags.size() == 0) || (BTags.size() == 0))
