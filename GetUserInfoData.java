@@ -59,8 +59,8 @@ public class GetUserInfoData {
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
-					//ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
+					//ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("user");
 					if(nl != null && nl.getLength() > 0) {
@@ -107,8 +107,7 @@ public class GetUserInfoData {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
 					//System.out.println(resString);
-					//ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("track");
 					if(nl != null && nl.getLength() > 0) {
@@ -158,16 +157,14 @@ public class GetUserInfoData {
 				return LastfmMain.hmTrackTags.get(trackName);
 			}
 			String subStr = "track="+trackName+"&artist="+artist;
-			//String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist, "UTF-8");
-			String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist);
+			String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist, "UTF-8");
 			StringBuffer trackTags = new StringBuffer();
 			WebResource webResource = client.resource(url);
 			ClientResponse cr =  webResource.get(ClientResponse.class);;
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
-					//ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
 					if(bs != null){
 						Element docEle = LastfmObjectUtil.parseXml(bs);
 						if(docEle != null){
@@ -327,6 +324,7 @@ public class GetUserInfoData {
 					hmUser.put(userIdArray[i], user);
 				if(i %20 == 0){
 					dumpUserData(country, outPath, i);
+					hmUser.clear();
 				}
 			}
 		}catch(Exception e){
