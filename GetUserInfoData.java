@@ -59,7 +59,8 @@ public class GetUserInfoData {
 			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
+					//ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("user");
 					if(nl != null && nl.getLength() > 0) {
@@ -86,7 +87,7 @@ public class GetUserInfoData {
 				return null;
 			}
 		}catch(Exception e){
-			System.err.println("exception caught ");
+			System.err.println("exception caught fetching user info");
 			e.printStackTrace();
 			return null;
 		}
@@ -106,7 +107,8 @@ public class GetUserInfoData {
 				String resString = cr.getEntity(String.class);
 				if(resString != null){
 					//System.out.println(resString);
-					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
+					//ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
 					Element docEle = LastfmObjectUtil.parseXml(bs);
 					NodeList nl = docEle.getElementsByTagName("track");
 					if(nl != null && nl.getLength() > 0) {
@@ -143,47 +145,59 @@ public class GetUserInfoData {
 				return null;
 			}
 		}catch(Exception e){
-			System.err.println("exception caught ");
+			System.err.println("exception caught in getUserTracks ");
 			e.printStackTrace();
 			return null;
 		}	}
 
 
 	//use hashmap to store tags
-	private String getTrackTagName(String trackName, String artist, String key) throws UnsupportedEncodingException, ClientHandlerException, UniformInterfaceException, JSONException {
-		if(LastfmMain.hmTrackTags.containsKey(trackName)){
-			return LastfmMain.hmTrackTags.get(trackName);
-		}
-		String subStr = "track="+trackName+"&artist="+artist;
-		String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist, "UTF-8");
-		StringBuffer trackTags = new StringBuffer();
-		WebResource webResource = client.resource(url);
-		ClientResponse cr =  webResource.get(ClientResponse.class);;
-		if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
-			String resString = cr.getEntity(String.class);
-			if(resString != null){
-				ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
-				Element docEle = LastfmObjectUtil.parseXml(bs);
-				NodeList nl = docEle.getElementsByTagName("track");
-				if(nl != null && nl.getLength() > 0) {
-					for(int i = 0 ; i < nl.getLength();i++) {
-						Element el = (Element) nl.item(i);
-						NodeList tagName  =  el.getElementsByTagName("tag");
-						for(int j = 0; j < tagName.getLength(); j++){
-							Element tag = (Element)tagName.item(j);
-							String trkTag =  LastfmObjectUtil.getTextValue(tag, "name");
-							if(trkTag != null){
-								trackTags.append(trkTag+";");
+	private String getTrackTagName(String trackName, String artist, String key)  {
+		try{
+			if(LastfmMain.hmTrackTags.containsKey(trackName)){
+				return LastfmMain.hmTrackTags.get(trackName);
+			}
+			String subStr = "track="+trackName+"&artist="+artist;
+			//String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist, "UTF-8");
+			String url = BASE_URL+"method=track.getinfo&api_key="+key+"&track="+URLEncoder.encode(trackName, "UTF-8")+"&artist="+URLEncoder.encode(artist);
+			StringBuffer trackTags = new StringBuffer();
+			WebResource webResource = client.resource(url);
+			ClientResponse cr =  webResource.get(ClientResponse.class);;
+			if (Response.Status.Family.SUCCESSFUL.equals(cr.getClientResponseStatus().getFamily())) {
+				String resString = cr.getEntity(String.class);
+				if(resString != null){
+					//ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes("UTF-8"));
+					ByteArrayInputStream bs = new ByteArrayInputStream(resString.getBytes());
+					if(bs != null){
+						Element docEle = LastfmObjectUtil.parseXml(bs);
+						if(docEle != null){
+							NodeList nl = docEle.getElementsByTagName("track");
+							if(nl != null && nl.getLength() > 0) {
+								for(int i = 0 ; i < nl.getLength();i++) {
+									Element el = (Element) nl.item(i);
+									NodeList tagName  =  el.getElementsByTagName("tag");
+									for(int j = 0; j < tagName.getLength(); j++){
+										Element tag = (Element)tagName.item(j);
+										String trkTag =  LastfmObjectUtil.getTextValue(tag, "name");
+										if(trkTag != null){
+											trackTags.append(trkTag+";");
+										}
+									}
+								}
 							}
 						}
 					}
 				}
+				LastfmMain.hmTrackTags.put(trackName, trackTags.toString());
+				return trackTags.toString();
+			}else{
+				System.err.println("error in fetching user tracks...ignoring");
+				return null;	
 			}
-			LastfmMain.hmTrackTags.put(trackName, trackTags.toString());
-			return trackTags.toString();
-		}else{
-			System.err.println("error in fetching user tracks...ignoring");
-			return null;	
+		}catch(Exception e){
+			System.err.println("exception in get track tag n	ame");
+			e.printStackTrace();
+			return null;
 		}
 	}
 
@@ -302,9 +316,15 @@ public class GetUserInfoData {
 			int count =userIdArray.length;
 			//for(int i = count-1; i >= 0; i--){
 			for(int i = 0; i < count-1; i++){
-				System.out.println("count = "+i);
-				User user = userInfo.getUserInfo(key, userIdArray[i]);
-				hmUser.put(userIdArray[i], user);
+				System.out.println("user id count = "+i);
+				User user = null;
+				try{
+					user = userInfo.getUserInfo(key, userIdArray[i]);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				if(user != null)
+					hmUser.put(userIdArray[i], user);
 				if(i %20 == 0){
 					dumpUserData(country, outPath, i);
 				}
