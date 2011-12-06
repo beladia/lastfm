@@ -345,7 +345,7 @@ public class LastFm {
 		for (Track t : A.getHsTracks().keySet()) {
 			if (t.getTagName() != null) {
 				StringTokenizer str = new StringTokenizer(t.getTagName(), ";");
-				while(str.hasMoreElements)
+				while(str.hasMoreElements())
 					ATags.add(str.nextToken());
 			} 		
 		}
@@ -354,7 +354,7 @@ public class LastFm {
 		for (Track t : B.getHsTracks().keySet()) {
 			if (t.getTagName() != null) {
 				StringTokenizer str = new StringTokenizer(t.getTagName(), ";");
-				while(str.hasMoreElements)
+				while(str.hasMoreElements())
 					BTags.add(str.nextToken());
 			} 		
 		}
@@ -687,12 +687,12 @@ public class LastFm {
 					if (u1 < u2){
 						user1 = users.get(u1);
 						user2 = users.get(u2);
-						edgePair = u1 + "#" + u2;
+						edgePair = hmUserID.get(user1) + "#" + hmUserID.get(user2);
 					}
 					else {
 						user1 = users.get(u2);
 						user2 = users.get(u1);
-						edgePair = u2 + "#" + u1;
+						edgePair = hmUserID.get(user2) + "#" + hmUserID.get(user1);
 					}
 
 					try{
