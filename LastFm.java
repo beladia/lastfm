@@ -67,6 +67,7 @@ public class LastFm {
 	// Calculate influence score of User A on User B
 	public static double calculateInfluence(User A, User B){
 		double influence = 0.0;
+		int count = 0;
 		double days;
 
 		if ((A == null) || (B == null))
@@ -75,6 +76,35 @@ public class LastFm {
 		// Get Common Tracks played by User A and User B
 		HashMap<Track, ArrayList<String>> aTracks = A.getHsTracks();
 		HashMap<Track, ArrayList<String>> bTracks = B.getHsTracks();
+		
+		HashSet<Track> intersect = new HashSet<Track>();
+		intersect.addAll(aTracks.keySet());
+		intersect.retainAll(bTracks.keySet());
+		
+		
+		ArrayList<String> aTimeList, bTimeList;
+		// For each of the common tracks calculate a cumulative influence
+		for (Track t : intersect) {
+			aTimeList = aTracks.get(t);
+			bTimeList = bTracks.get(t);
+			
+			for (int i=0; i<aTimeList.size();i++) {
+				for (int j=0; j<bTimeList.size();j++) {
+					Date aDate = parseDate(aTimeList.get(i));
+					Date bDate = parseDate(bTimeList.get(j));
+					
+					if(aDate.before(bDate)){
+						days = (bDate.getTime() - aDate.getTime())/(1000*60*60*24);
+						if (days == 0)
+							influence += 1;
+						else influence += Math.exp(-1 * days);
+						
+						count++;
+					}					
+				}
+			}
+		}
+/**		
 
 		Iterator<Track> it =  aTracks.keySet().iterator();
 		while(it.hasNext()){
@@ -100,6 +130,14 @@ public class LastFm {
 		if (influence > 0)
 			influence = influence / B.getHsTracks().size();	
 		influence = Math.rint(influence * 1000.0d) / 1000.0d;
+		
+		
+**/
+
+		if ((influence > 0) && (count > 0))
+			influence = (double)influence / count;	
+		influence = Math.rint(influence * 1000.0d) / 1000.0d;
+
 		return influence;		
 	}
 
@@ -622,9 +660,11 @@ public class LastFm {
 	}
 
 	public static void main(String[] args) throws IOException{				
-		String prefixPath = "C:\\Users\\beladia\\workspace\\lastfm\\datazips\\spain-data-with-tags\\spain-data-with-tags\\";
-		String filePath = prefixPath + "hmUser_spain_2";
+		String prefixPath = "C:\\Users\\beladia\\workspace\\lastfm\\src\\lastfm\\data\\spain-2200-users\\";
+		String filePath = prefixPath + "hmUser_spain_sample_20users_newformat";
 		hmUser = readUser(filePath);
+		
+/**		
 		hmUser.putAll(readUser(prefixPath + "hmUser_spain_3"));
 		hmUser.putAll(readUser(prefixPath + "hmUser_spain_4"));
 		hmUser.putAll(readUser(prefixPath + "hmUser_spain_6"));
@@ -650,6 +690,8 @@ public class LastFm {
 		
 		filePath = prefixPath + "traindata_tags_spain234.dat";
 		generateTrainData(filePath, 10000);
+		
+**/		
 	}
 
 
